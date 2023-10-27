@@ -11,9 +11,10 @@ import Profile from "../components/Profile";
 import { AppConText } from "./AppContext";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import IonIcons from "react-native-vector-icons/Ionicons";
-import DetailClient from "../components/DetailClient";
-import Client from "../components/Client";
-import { NavigationContainer } from "@react-navigation/native";
+import ManagerClient from "../components/ManagerClient";
+import Register from "../components/Register";
+import ManagerBill from "../components/ManagerBill";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -33,9 +34,11 @@ const Tab = createBottomTabNavigator();
 const Main = () => {
   return (
     <Tab.Navigator
-      screenOptions={{
+      initialRouteName="PageHome"
+      screenOptions={({route}) =>({
         headerShown: false,
         tabBarStyle: {
+          display: hideTabBar(route),
           position: "absolute",
           bottom: 15,
           left: 10,
@@ -50,16 +53,16 @@ const Main = () => {
           bottom: 10,
           fontSize: 12,
         },
-      }}
+      })}
     >
       <Tab.Screen
-        name="PageHome"
-        component={PageHome}
+        name="Home"
+        component={Home}
         options={({ route }) => ({
           title: "Trang chủ",
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-            if (route.name == "PageHome") {
+            if (route.name == "Home") {
               iconName = focused ? "home" : "home";
             }
             return <FontAwesome5 name={iconName} size={size} color={color} />;
@@ -92,19 +95,20 @@ const Main = () => {
             if (route.name == "History") {
               iconName = focused ? "history" : "history";
             }
-            return <FontAwesome5 name={iconName} size={23} color={color} />;
+            return <FontAwesome5 name={iconName} size={23} color={color}/>;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}
       ></Tab.Screen>
       <Tab.Screen
-        name="Profile"
-        component={Profile}
+        name="PageProfile"
+        component={PageProfile}
         options={({ route }) => ({
+          // tabBarStyle:{display: hideTabBar(route)},
           title: "Cá nhân",
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-            if (route.name == "Profile") {
+            if (route.name == "PageProfile") {
               iconName = focused ? "user-circle" : "user-circle";
             }
             return <FontAwesome5 name={iconName} size={size} color={color} />;
@@ -116,15 +120,28 @@ const Main = () => {
   );
 };
 
-//home
-const PageHome = () => {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={Home}/>
+//profile
+const PageProfile = () =>{
+  return(
+    <Stack.Navigator initialRouteName="Profile">
+      <Stack.Screen name="Profile" component={Profile} options={{headerShown: false}}/>
+      <Stack.Screen name="ManagerClient" component={ManagerClient} options={{headerTitle: "Quản lý khách hàng"}}/>
+      <Stack.Screen name="ManagerBill" component={ManagerBill} options={{headerTitle: "Quản lý hóa đơn"}}/>
+      <Stack.Screen name="Register" component={Register} options={{headerTitle: "Đăng ký người dùng"}}/>
     </Stack.Navigator>
   );
-};
+}
 
+const hideTabBar = (route)=>{
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile';
+
+  const screensToHideTabBar = ['ManagerClient', 'ManagerBill', 'Register'];
+  
+  if (screensToHideTabBar.includes(routeName)) {
+    return 'none';
+  }
+  return 'flex';
+}
 
 const AppNavigator = () => {
   const { isLogin } = useContext(AppConText);

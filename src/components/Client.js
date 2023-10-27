@@ -36,14 +36,13 @@ const Client = () => {
   };
 
   useEffect(() => {
-    
     fetchData();
   }, []);
 
-  const handleRefreshData = ()=>{
+  const handleRefreshData = () => {
     setRefreshing(true);
     fetchData();
-  }
+  };
 
   const openModal = (itemId) => {
     const selectedItem = data.find((item) => item._id === itemId);
@@ -54,10 +53,11 @@ const Client = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', padding: 20}}>
-        <Text>Họ và tên</Text>
-        <Text>Số điện thoại</Text>
+      <View style={styles.title}>
+        <Text style={styles.text}>Họ và tên</Text>
+        <Text style={styles.text}>Số điện thoại</Text>
       </View>
+
       <FlatList
         refreshing={refreshing}
         onRefresh={handleRefreshData}
@@ -169,5 +169,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 5,
   },
-  textModalStyle: {},
+  text: {
+    fontWeight: "bold",
+  },
+  title: { 
+    flexDirection: "row", 
+    padding: 20, 
+    justifyContent: "space-between" },
 });

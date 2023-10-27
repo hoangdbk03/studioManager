@@ -32,7 +32,7 @@ const Register = () => {
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
-      <Text style={styles.loginText}>Đăng ký</Text>
+      
       <View style={styles.bar} />
       <View>
         <View style={styles.inputEmail}>
@@ -116,9 +116,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   img: {
-    width: 360,
-    height: 225,
-    marginTop: 50,
+    width: '80%',
+    height: '30%',
   },
   loginText: {
     color: "#0E55A7",

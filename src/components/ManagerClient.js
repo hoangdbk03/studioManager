@@ -1,14 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const DetailClient = () => {
+const ManagerClient = () => {
+
   return (
     <View>
-      <Text>DetailClient</Text>
+      <Text>ManagerClient</Text>
     </View>
   )
 }
 
-export default DetailClient
+export default ManagerClient
 
 const styles = StyleSheet.create({})

@@ -13,6 +13,13 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const TabTop = createMaterialTopTabNavigator();
 
+const CustomTab = ({ label, imageSource, isFocused, onPress }) => (
+  <TouchableOpacity onPress={onPress}>
+    <Image source={imageSource} style={{ width: 30, height: 30, tintColor: isFocused ? '#0E55A7' : 'black' }} />
+    <Text style={{ color: isFocused ? '#0E55A7' : 'black' }}>{label}</Text>
+  </TouchableOpacity>
+);
+
 const Home = ({navigation}) => {
   const { inforUser } = useContext(AppConText);
 
@@ -50,43 +57,30 @@ const Home = ({navigation}) => {
           <TabTop.Screen
             name="Client"
             component={Client}
-            options={({ route }) => ({
+            options={{
               tabBarLabel: 'Khách hàng',
-              tabBarIcon: ({ focused, color }) => {
-                let iconName;
-
-                if (route.name == "Client") {
-                  iconName = focused ? "clipboard-list" : "clipboard-list";
-                }
-                return (
-                  <FontAwesome5Icon color={color} name={iconName} size={30} />
-                );
-              },
-              tabBarActiveTintColor: "#0E55A7",
-              tabBarInactiveTintColor: 'black',
-              tabBarIndicatorStyle: {width: 80, marginHorizontal: '9%', backgroundColor: '#0E55A7', borderRadius: 20}
-            })}
+              tabBarIcon: ({ focused }) => (
+                <CustomTab
+                  
+                  imageSource={require('../icons/list.png')}
+                  isFocused={focused}
+                />
+              ),
+            }}
           />
           <TabTop.Screen
             name="Bill"
             component={Bill}
-            options={({ route }) => ({
+            options={{
               tabBarLabel: 'Hóa đơn',
-              tabBarIcon: ({ focused, color }) => {
-                let iconName;
-
-                if (route.name == "Bill") {
-                  iconName = focused
-                    ? "file-invoice-dollar"
-                    : "file-invoice-dollar";
-                }
-                return (
-                  <FontAwesome5Icon name={iconName} color={color} size={30} />
-                );
-              },
-              tabBarActiveTintColor: "#0E55A7",
-              tabBarIndicatorStyle: {width: 80, marginHorizontal: '9%', backgroundColor: '#0E55A7', borderRadius: 20}
-            })}
+              tabBarIcon: ({ focused }) => (
+                <CustomTab
+                  
+                  imageSource={require('../icons/bill.png')}
+                  isFocused={focused}
+                />
+              ),
+            }}
           />
         </TabTop.Navigator>
       </View>
@@ -165,7 +159,7 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
-    width: "100%",
+    width: "95%",
     height: "55%",
     backgroundColor: "white",
     position: "absolute",
