@@ -10,6 +10,9 @@ import React, { useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import Ant from "react-native-vector-icons/AntDesign";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { Axios } from "axios";
+import AxiosIntance from "../util/AxiosIntance";
+import Toast from "react-native-toast-message";
 
 const dataRole = [
   { label: "Quản lý", value: "1" },
@@ -29,6 +32,53 @@ const dataWork = [
 const Register = () => {
   const [roleValue, setroleValue] = useState(null);
   const [workValue, setworkValue] = useState(null);
+  const [emailClient, setemailClient] = useState("");
+  const [nameClient, setnameClient] = useState("");
+  const [roleClient, setroleClient] = useState("");
+  const [jobClient, setjobeClient] = useState("");
+  const handleRegister = async() =>{
+
+    if (!emailClient || !nameClient || !roleValue) {
+      Toast.show({
+        type: "info",
+        text1: "VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN."
+      })
+    }
+
+    const dataRegister ={
+      email: emailClient,
+      name: nameClient,
+      role: jobClient,
+      job: jobClient
+    }
+
+    try {
+      const response = await AxiosIntance().post('/user/register', dataRegister);
+
+      if (response) {
+        Toast.show({
+          type: "success",
+          text1: response.message
+        });
+
+        setemailClient("");
+        setnameClient("");
+        setroleClient(null);
+        setjobeClient(null);
+      }else{
+        Toast.show({
+          type: "error",
+          text1: response.message
+        })
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: response.message
+      })
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
@@ -40,6 +90,7 @@ const Register = () => {
             style={styles.textInput}
             placeholder="example@gmail.com"
             underlineColor="red"
+            onChangeText={setemailClient}
           />
         </View>
         <View style={styles.viewLabelEmail}>
@@ -50,7 +101,7 @@ const Register = () => {
       </View>
       <View>
         <View style={styles.inputName}>
-          <TextInput style={styles.textInput} placeholder="Nguyễn Văn A" />
+          <TextInput style={styles.textInput} placeholder="Nguyễn Văn A" onChangeText={setnameClient}/>
         </View>
         <View style={styles.viewLabelName}>
           <Text Text style={styles.label}>
@@ -74,6 +125,7 @@ const Register = () => {
         onChange={(item) => {
           setroleValue(item.value);
         }}
+        onChangeText={setroleClient}
         renderLeftIcon={() => (
           <Icon style={styles.icon} name="add-moderator" size={20} />
         )}
@@ -95,12 +147,13 @@ const Register = () => {
         onChange={(item) => {
           setworkValue(item.value);
         }}
+        onChangeText={setjobeClient}
         renderLeftIcon={() => (
           <Ant style={styles.icon} name="idcard" size={20} />
         )}
       />
 
-      <TouchableOpacity style={styles.buttonRegister}>
+      <TouchableOpacity style={styles.buttonRegister} onPress={handleRegister}>
         <Text style={styles.textButton}>Đăng Ký</Text>
       </TouchableOpacity>
     </View>

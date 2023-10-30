@@ -34,7 +34,7 @@ const Tab = createBottomTabNavigator();
 const Main = () => {
   return (
     <Tab.Navigator
-      initialRouteName="PageHome"
+      initialRouteName="Home"
       screenOptions={({route}) =>({
         headerShown: false,
         tabBarStyle: {

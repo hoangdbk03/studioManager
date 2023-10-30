@@ -1,46 +1,106 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useContext } from "react";
-import { AppConText } from "../util/AppContext";
 import {
-  NavigationContainer,
-  getFocusedRouteNameFromRoute,
-} from "@react-navigation/native";
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { Component, useContext, useEffect, useState } from "react";
+import { AppConText } from "../util/AppContext";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Client from "../components/Client";
 import Bill from "../components/Bill";
-import FontAwesome5Icon from "react-native-vector-icons/FontAwesome5";
-import { createStackNavigator } from "@react-navigation/stack";
+import { vi } from "date-fns/locale";
+import "intl";
+import "intl/locale-data/jsonp/vi";
+import { format } from "date-fns";
+import AxiosIntance from "../util/AxiosIntance";
 
 const TabTop = createMaterialTopTabNavigator();
 
 const CustomTab = ({ label, imageSource, isFocused, onPress }) => (
   <TouchableOpacity onPress={onPress}>
-    <Image source={imageSource} style={{ width: 30, height: 30, tintColor: isFocused ? '#0E55A7' : 'black' }} />
-    <Text style={{ color: isFocused ? '#0E55A7' : 'black' }}>{label}</Text>
+    <Image
+      source={imageSource}
+      style={{
+        width: 30,
+        height: 30,
+        tintColor: isFocused ? "#0E55A7" : "black",
+      }}
+    />
+    <Text style={{ color: isFocused ? "#0E55A7" : "black" }}>{label}</Text>
   </TouchableOpacity>
 );
 
-const Home = ({navigation}) => {
+const Home = () => {
+  const [data, setData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDataFromServer = async () => {
+    try {
+      const response = await AxiosIntance().get("/user/list/update/");
+      const newData = await response;
+
+      setData(newData);
+      setRefreshing(false);
+    } catch (error) {}
+  };
+
+  const handleRefreshData = () => {
+    setRefreshing(true);
+    fetchDataFromServer();
+  };
+
+  useEffect(() => {
+    fetchDataFromServer();
+    // Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt
+    if (Platform.OS === "android") {
+      require("intl/locale-data/jsonp/vi");
+    }
+  }, []);
+
+  // Lấy ngày hiện tại
+  const today = new Date();
+
+  const dayName = format(today, "EEEE", { locale: vi });
+  const dayOfMonth = format(today, "d MMMM yyyy", { locale: vi });
+
   const { inforUser } = useContext(AppConText);
 
   return (
     <View style={styles.container}>
       {/* phần header avatar, ngày tháng và background */}
-      <View style={styles.header}>
-        <View style={styles.daymon_avatar}>
-          <View style={{ width: 300 }}>
-            <Text style={styles.day}>Thứ Hai</Text>
-            <Text style={styles.daymon}>Ngày 13/10/2023</Text>
+      <ScrollView refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefreshData} />
+      }>
+        <View style={styles.header}>
+          <View style={styles.daymon_avatar}>
+            <View style={{ width: 300 }}>
+              <Text style={styles.day}>{dayName}</Text>
+              <Text style={styles.daymon}>Ngày {dayOfMonth}</Text>
+            </View>
+            <View style={styles.conavatar}>
+              {inforUser.avatar ? (
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: inforUser.avatar }}
+                />
+              ) : (
+                <Image
+                  style={styles.avatar}
+                  source={require("../icons/user.png")}
+                />
+              )}
+            </View>
           </View>
-          <View style={styles.conavatar}>
-            <Image style={styles.avatar} source={{ uri: inforUser.avatar }} />
-          </View>
+          <Image
+            style={styles.logoHome}
+            source={require("../img/logoHome.jpg")}
+          />
         </View>
-        <Image
-          style={styles.logoHome}
-          source={require("../img/logoHome.jpg")}
-        />
-      </View>
+      </ScrollView>
 
       {/* phần thân */}
       <View style={styles.body}>
@@ -49,7 +109,7 @@ const Home = ({navigation}) => {
           initialRouteName="Client"
           screenOptions={{
             tabBarInactiveTintColor: "black",
-            tabBarLabelStyle: {textTransform: 'none'  },
+            tabBarLabelStyle: { textTransform: "none" },
             tabBarIconStyle: { height: 35 },
             ...styles.tabTop,
           }}
@@ -58,11 +118,10 @@ const Home = ({navigation}) => {
             name="Client"
             component={Client}
             options={{
-              tabBarLabel: 'Khách hàng',
+              tabBarLabel: "Khách hàng",
               tabBarIcon: ({ focused }) => (
                 <CustomTab
-                  
-                  imageSource={require('../icons/list.png')}
+                  imageSource={require("../icons/list.png")}
                   isFocused={focused}
                 />
               ),
@@ -72,11 +131,10 @@ const Home = ({navigation}) => {
             name="Bill"
             component={Bill}
             options={{
-              tabBarLabel: 'Hóa đơn',
+              tabBarLabel: "Hóa đơn",
               tabBarIcon: ({ focused }) => (
                 <CustomTab
-                  
-                  imageSource={require('../icons/bill.png')}
+                  imageSource={require("../icons/bill.png")}
                   isFocused={focused}
                 />
               ),
@@ -135,11 +193,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 50,
+    backgroundColor: "white",
   },
   conavatar: {
     backgroundColor: "#5e5e5e",
-    width: 45,
-    height: 45,
+    width: 42,
+    height: 42,
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",

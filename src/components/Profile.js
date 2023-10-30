@@ -13,6 +13,7 @@ import AxiosIntance from "../util/AxiosIntance";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 
 const Profile = () => {
@@ -24,15 +25,22 @@ const Profile = () => {
 
   const [idsession, setidsession] = useState(inforUser.session_id);
 
+  //gọi api xử lý đăng xuất
   const logout = async () => {
     try {
       const response = await AxiosIntance().get("/user/logout/" + idsession);
       if (response) {
         setisLogin(false);
-        ToastAndroid.show("Đăng xuất thành công", ToastAndroid.SHORT);
+        Toast.show({
+          type: "success",
+          text1: "ĐĂNG XUẤT THÀNH CÔNG"
+        })
       }
     } catch (error) {
-      ToastAndroid.show("Đăng xuất thất bại", ToastAndroid.SHORT);
+      Toast.show({
+        type: "error",
+        text1: "ĐĂNG XUẤT THẤT BẠI"
+      })
     }
   };
 
@@ -108,17 +116,17 @@ const Profile = () => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.frame}>
+          <TouchableOpacity style={styles.frame} onPress={()=> navigation.navigate("Register")}>
             <View style={styles.frameIcon}>
               <Image
-                source={require("../icons/password.png")}
+                source={require("../icons/add-user.png")}
                 style={styles.icon}
               />
             </View>
             <View style={{ marginStart: 10 }}>
-              <Text style={{ fontSize: 16 }}>Đổi mật khẩu</Text>
+              <Text style={{ fontSize: 16 }}>Đăng ký tài khoản</Text>
               <Text style={{ fontSize: 10, color: "gray" }}>
-                Thay đổi mật khẩu mới
+                Đăng ký tài khoản người dùng mới
               </Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
@@ -134,15 +142,15 @@ const Profile = () => {
 
         {/* phần các chức năng thông tin*/}
         <View style={styles.body1}>
-          <TouchableOpacity style={styles.frame1} onPress={() =>{navigation.navigate("Register")}}>
+          <TouchableOpacity style={styles.frame1}>
             <View style={styles.frameIcon}>
               <Image
-                source={require("../icons/add-user.png")}
+                source={require("../icons/password.png")}
                 style={styles.icon}
               />
             </View>
             <View style={{ marginStart: 10 }}>
-              <Text style={{ fontSize: 16 }}>Đăng ký tài khoản người dùng</Text>
+              <Text style={{ fontSize: 16 }}>Đổi mật khẩu</Text>
             </View>
             <View style={{ flex: 1, alignItems: "flex-end" }}>
               <MaterialIcons

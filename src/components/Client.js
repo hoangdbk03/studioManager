@@ -13,16 +13,15 @@ import React, { useEffect, useState } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import ItemListClient from "./ItemListClient";
 import Modal1 from "react-native-modal";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-toast-message";
 
 const Client = () => {
-  const navigation = useNavigation();
   const [data, setdata] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedData, setselectedData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  //gọi api
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get("/client/list/");
@@ -39,36 +38,45 @@ const Client = () => {
     fetchData();
   }, []);
 
+  //xử lý load lại data
   const handleRefreshData = () => {
     setRefreshing(true);
     fetchData();
+    Toast.show({
+      type: "success",
+      text1: "Cập nhật thành công",
+    });
   };
 
+  //hiển thị modal chi tiết của item được nhấn
   const openModal = (itemId) => {
     const selectedItem = data.find((item) => item._id === itemId);
     setselectedData(selectedItem);
     setModalVisible(true);
-    console.log("detail: " + itemId);
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <View style={styles.title}>
+        <Text style={styles.text}>STT</Text>
         <Text style={styles.text}>Họ và tên</Text>
         <Text style={styles.text}>Số điện thoại</Text>
       </View>
 
+      {/* Danh sách khách hàng */}
       <FlatList
         refreshing={refreshing}
         onRefresh={handleRefreshData}
         data={data}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => openModal(item._id)}>
-            <ItemListClient item={item} />
+            <ItemListClient item={item} index={index} />
           </TouchableOpacity>
         )}
       />
+
+      {/* Modal chi tiết của item */}
       <Modal1 isVisible={isModalVisible}>
         <View
           style={{
@@ -172,8 +180,9 @@ const styles = StyleSheet.create({
   text: {
     fontWeight: "bold",
   },
-  title: { 
-    flexDirection: "row", 
-    padding: 20, 
-    justifyContent: "space-between" },
+  title: {
+    flexDirection: "row",
+    padding: 20,
+    justifyContent: "space-between",
+  },
 });

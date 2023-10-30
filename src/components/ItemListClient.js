@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 
 const ItemListClient = (props) => {
-  const {item} = props;
+  const {item, index} = props;
 
   return (
       <View style={styles.container}>
+        <Text>{index + 1}</Text>
         <Text>{item.name}</Text>
         <Text>{item.phone}</Text>
       </View>

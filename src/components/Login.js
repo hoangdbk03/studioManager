@@ -15,6 +15,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { Checkbox } from "react-native-paper";
 import AxiosIntance from "../util/AxiosIntance";
 import { AppConText } from "../util/AppContext";
+import Toast from "react-native-toast-message";
 
 const Login = () => {
   const { setisLogin, setinforUser } = useContext(AppConText);
@@ -23,6 +24,15 @@ const Login = () => {
   const [passwordUser, setpasswordUser] = useState("");
 
   const goLogin = async () => {
+
+    if (!emailUser || !passwordUser) {
+      Toast.show({
+        type: "info",
+        text1: "VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN."
+      });
+      return;
+    }
+
     try {
       const response = await AxiosIntance().post("/user/login", {
         email: emailUser,
@@ -30,14 +40,23 @@ const Login = () => {
       });
 
       if (response.loggedin) {
-        ToastAndroid.show("Đăng nhập thành công", ToastAndroid.SHORT);
+        Toast.show({
+          type: "success",
+          text1: "ĐĂNG NHẬP THÀNH CÔNG",
+        })
         setisLogin(true);
         setinforUser(response);
       } else {
-        ToastAndroid.show("Mật khẩu không chính xác!", ToastAndroid.SHORT);
+        Toast.show({
+          type: "error",
+          text1: "SAI MẬT KHẨU!"
+        })
       }
     } catch (error) {
-      ToastAndroid.show("Email đăng nhập không tồn tại!", ToastAndroid.SHORT);
+      Toast.show({
+        type: "error",
+        text1: "EMAIL KHÔNG TỒN TẠI!"
+      })
     }
   };
 
@@ -179,7 +198,7 @@ const styles = StyleSheet.create({
   },
   fontLogin: {
     width: "100%",
-    maxHeight: '100%',
+    maxHeight: "100%",
     backgroundColor: "white",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
