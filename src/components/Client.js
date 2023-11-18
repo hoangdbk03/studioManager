@@ -14,12 +14,17 @@ import AxiosIntance from "../util/AxiosIntance";
 import ItemListClient from "./ItemListClient";
 import Modal1 from "react-native-modal";
 import Toast from "react-native-toast-message";
+import { format, parseISO } from "date-fns";
 
 const Client = () => {
   const [data, setdata] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedData, setselectedData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const dateTimeString = selectedData ? selectedData.createdAt : null;
+
+  const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
+  const formattedDateTime = dateTime ? format(dateTime, "dd/MM/yyyy HH:mm:ss") : null;
 
   //gọi api
   const fetchData = async () => {
@@ -56,14 +61,7 @@ const Client = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <View style={styles.title}>
-        <Text style={styles.text}>STT</Text>
-        <Text style={styles.text}>Họ và tên</Text>
-        <Text style={styles.text}>Số điện thoại</Text>
-      </View>
-
-      {/* Danh sách khách hàng */}
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <FlatList
         refreshing={refreshing}
         onRefresh={handleRefreshData}
@@ -140,25 +138,18 @@ const Client = () => {
                   justifyContent: "space-between",
                 }}
               >
-                <Text style={styles.textModalStyle}>Ngày tạo: </Text>
+                <Text style={styles.textModalStyle}>Thời gian tạo: </Text>
                 <Text style={styles.textModalStyle}>
-                  {selectedData.datejoin}
+                  {formattedDateTime}
                 </Text>
               </View>
             </>
           ) : null}
           <TouchableOpacity
             onPress={() => setModalVisible(false)}
-            style={{
-              marginTop: 20,
-              height: 30,
-              backgroundColor: "red",
-              alignItems: "center",
-            }}
+            style={styles.button2}
           >
-            <Text style={{ fontSize: 20, color: "white", fontWeight: "bold" }}>
-              Đóng
-            </Text>
+            <Text style={{ color: "#0E55A7", fontWeight: "bold" }}>ĐÓNG</Text>
           </TouchableOpacity>
         </View>
       </Modal1>
@@ -172,7 +163,7 @@ const styles = StyleSheet.create({
   titleModal: {
     backgroundColor: "#0E55A7",
     width: "100%",
-    height: 40,
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 5,
@@ -184,5 +175,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
     justifyContent: "space-between",
+  },
+  button2: {
+    borderWidth: 1,
+    width: "100%",
+    padding: 15,
+    alignItems: "center",
+    borderColor: "#dbdbdb",
+    marginTop: 20,
   },
 });

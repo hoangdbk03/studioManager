@@ -5,24 +5,28 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
-import ItemListClientAdmin from "./ItemListClientAdmin";
 import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { AppConText } from "../util/AppContext";
+import { styleModal } from "../style/styleModal";
+import ItemListClientAdmin from "./ItemListClientAdmin";
 
 const ManagerClient = () => {
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setUpdateModalVisible] = useState(false);
   const [data, setdata] = useState([]);
+  const { inforUser } = useContext(AppConText);
 
   //lưu giá trị được thêm
   const [addData, setaddData] = useState({
-    name: '',
-    address: '',
-    phone: '',
+    name: "",
+    address: "",
+    phone: "",
+    creatorID: inforUser._id,
   });
 
   //lưu giá trị cập nhật
@@ -32,14 +36,15 @@ const ManagerClient = () => {
     phone: "",
   });
 
-  const toggleAddModal = ()=>{
+  //ẩn modal
+  const toggleAddModal = () => {
     setAddModalVisible(!isAddModalVisible);
-  }
-
+  };
   const toggleUpdateModal = () => {
     setUpdateModalVisible(!isUpdateModalVisible);
   };
 
+  //lấy danh sách khách hàng
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get("/client/list/");
@@ -53,40 +58,70 @@ const ManagerClient = () => {
     }
   };
 
-  const handleAddClient = async() =>{
-    try {
-      await AxiosIntance().post('/client/create', addData);
-      Toast.show({
-        type: "success",
-        text1: "Thêm thành công"
-      });
+  // xử lý thêm dữ liệu
+  const handleAddClient = async () => {
+    if (
+      addData.name.trim() === "" ||
+      addData.address.trim() === "" ||
+      addData.phone.trim() === ""
+    ) {
       toggleAddModal();
-      fetchData();
-    } catch (error) {
       Toast.show({
-        type: 'error',
-        text1: 'Thêm thất bại',
+        type: "info",
+        text1: "Vui lòng nhập đầy đủ thông tin!",
       });
-    }
-  }
-
-  const handleUpdateItem = async () => {
-    try {
-      await AxiosIntance().put("/client/update/" + editedData._id, editedData);
-      Toast.show({
-        type: "success",
-        text1: "Cập nhật thành công",
-      });
-      fetchData(); // Cập nhật danh sách dữ liệu sau khi cập nhật
-      toggleUpdateModal();
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Cập nhật thất bại",
-      });
+    } else {
+      try {
+        await AxiosIntance().post("/client/create", addData);
+        Toast.show({
+          type: "success",
+          text1: "Thêm thành công",
+        });
+        toggleAddModal();
+        fetchData();
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Thêm thất bại",
+        });
+      }
     }
   };
 
+  // xử lý cập nhật dữ liệu
+  const handleUpdateItem = async () => {
+    if (
+      editedData.name.trim() === "" ||
+      editedData.address.trim() === "" ||
+      editedData.phone.trim() === ""
+    ) {
+      toggleUpdateModal();
+      Toast.show({
+        type: "info",
+        text1: "Vui lòng nhập đầy đủ thông tin!",
+      });
+    } else {
+      try {
+        await AxiosIntance().put(
+          "/client/update/" + editedData._id,
+          editedData
+        );
+        Toast.show({
+          type: "success",
+          text1: "Cập nhật thành công",
+        });
+        fetchData(); // Cập nhật danh sách dữ liệu sau khi cập nhật
+        toggleUpdateModal();
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Cập nhật thất bại",
+        });
+      }
+    }
+  };
+
+  //xử lý xóa dữ liệu
   const handleDeleteItem = async (itemId) => {
     try {
       await AxiosIntance().delete("/client/delete/" + itemId);
@@ -107,6 +142,7 @@ const ManagerClient = () => {
     fetchData();
   }, []);
 
+  //phần front-end
   return (
     <View style={styles.container}>
       <FlatList
@@ -129,53 +165,49 @@ const ManagerClient = () => {
       />
 
       <TouchableOpacity style={styles.fab} onPress={toggleAddModal}>
-          <MaterialIcons name="add" size={30} color="white"/>
+        <MaterialIcons name="add" size={30} color="white" />
       </TouchableOpacity>
 
       {/* Modal thêm thông tin khách hàng mới */}
       <Modal isVisible={isAddModalVisible}>
-      <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            
-            {/* Tạo các TextInput để chỉnh sửa thông tin ở đây */}
+        <View style={styleModal.modalContainer}>
+          <View style={styleModal.modalContent}>
+            <View style={styleModal.frameTitleModal}>
+              <Text style={styleModal.titleModal}>Thêm khách hàng mới</Text>
+            </View>
+
+            {/* Tạo các TextInput để thêm mới*/}
             <TextInput
               style={styles.textInput}
-              onChangeText={(text) =>
-                setaddData({ ...addData, name: text })
-              }
+              onChangeText={(text) => setaddData({ ...addData, name: text })}
               mode="outlined"
               label="Họ và tên"
             />
             <TextInput
               style={styles.textInput}
-              onChangeText={(text) =>
-                setaddData({ ...addData, address: text })
-              }
+              onChangeText={(text) => setaddData({ ...addData, address: text })}
               mode="outlined"
               label="Địa chỉ"
             />
             <TextInput
               style={styles.textInput}
-              onChangeText={(text) =>
-                setaddData({ ...addData, phone: text })
-              }
+              onChangeText={(text) => setaddData({ ...addData, phone: text })}
               mode="outlined"
               label="Số điện thoại"
               keyboardType="numeric"
             />
-            <View style={styles.button}>
+            <View style={styleModal.buttonModal}>
               <TouchableOpacity
                 onPress={toggleAddModal}
-                style={styles.buttonItem}
+                style={styleModal.button1}
               >
-                <Text>Hủy</Text>
+                <Text style={styleModal.textButton1}>Hủy</Text>
               </TouchableOpacity>
-              <Text style={{ width: 10 }} />
               <TouchableOpacity
                 onPress={handleAddClient}
-                style={styles.buttonItem}
+                style={styleModal.button2}
               >
-                <Text>Thêm</Text>
+                <Text style={styleModal.textButton2}>Thêm</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -184,9 +216,11 @@ const ManagerClient = () => {
 
       {/* Modal chỉnh sửa thông tin */}
       <Modal isVisible={isUpdateModalVisible}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            
+        <View style={styleModal.modalContainer}>
+          <View style={styleModal.modalContent}>
+            <View style={styleModal.frameTitleModal}>
+              <Text style={styleModal.titleModal}>Cập nhật khách hàng</Text>
+            </View>
             {/* Tạo các TextInput để chỉnh sửa thông tin ở đây */}
             <TextInput
               style={styles.textInput}
@@ -216,19 +250,18 @@ const ManagerClient = () => {
               label="Số điện thoại"
               keyboardType="numeric"
             />
-            <View style={styles.button}>
+            <View style={styleModal.buttonModal}>
               <TouchableOpacity
                 onPress={toggleUpdateModal}
-                style={styles.buttonItem}
+                style={styleModal.button1}
               >
-                <Text>Hủy</Text>
+                <Text style={styleModal.textButton1}>Hủy</Text>
               </TouchableOpacity>
-              <Text style={{ width: 10 }} />
               <TouchableOpacity
                 onPress={handleUpdateItem}
-                style={styles.buttonItem}
+                style={styleModal.button2}
               >
-                <Text>Cập nhật</Text>
+                <Text style={styleModal.textButton2}>Cập nhật</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -241,9 +274,9 @@ const ManagerClient = () => {
 export default ManagerClient;
 
 const styles = StyleSheet.create({
-  container:{
-    backgroundColor: 'white',
-    flex: 1
+  container: {
+    backgroundColor: "white",
+    flex: 1,
   },
   modalContainer: {
     flex: 1,
@@ -252,31 +285,24 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    padding: 10,
+    alignItems: "center",
     borderRadius: 5,
-    width: '100%'
-  },
-  buttonItem: {
-    borderWidth: 0.5,
-    padding: 8,
-  },
-  button: {
-    flexDirection: "row",
-    marginTop: 20,
-    justifyContent: "flex-end",
+    width: "100%",
   },
   textInput: {
     marginTop: 10,
+    width: "90%",
+    backgroundColor: '#f7fbff'
   },
   fab: {
-    position: 'absolute',
+    position: "absolute",
     width: 56,
     height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     right: 20,
     bottom: 20,
-    backgroundColor: '#0E55A7',
+    backgroundColor: "#0E55A7",
     borderRadius: 30,
     elevation: 8,
   },

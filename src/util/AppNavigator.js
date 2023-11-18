@@ -14,7 +14,9 @@ import IonIcons from "react-native-vector-icons/Ionicons";
 import ManagerClient from "../components/ManagerClient";
 import Register from "../components/Register";
 import ManagerBill from "../components/ManagerBill";
+import ManagerStaff from "../components/ManagerStaff";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import FloatingButton from "../items/FloatingButton";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -22,7 +24,8 @@ const Users = () => {
   return (
     <Stack.Navigator
       initialRouteName="Login"
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login" component={Login} />
     </Stack.Navigator>
@@ -35,18 +38,10 @@ const Main = () => {
   return (
     <Tab.Navigator
       initialRouteName="Home"
-      screenOptions={({route}) =>({
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
           display: hideTabBar(route),
-          position: "absolute",
-          bottom: 15,
-          left: 10,
-          right: 10,
-          elevation: 0,
-          borderRadius: 15,
-          height: 70,
-          backgroundColor: "white",
           ...styles.shadow,
         },
         tabBarLabelStyle: {
@@ -57,7 +52,7 @@ const Main = () => {
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={PageHome}
         options={({ route }) => ({
           title: "Trang chủ",
           tabBarIcon: ({ focused, color, size }) => {
@@ -95,7 +90,7 @@ const Main = () => {
             if (route.name == "History") {
               iconName = focused ? "history" : "history";
             }
-            return <FontAwesome5 name={iconName} size={23} color={color}/>;
+            return <FontAwesome5 name={iconName} size={23} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}
@@ -120,44 +115,90 @@ const Main = () => {
   );
 };
 
+//home
+const PageHome = () => {
+  return (
+    <>
+    <FloatingButton/>
+    <Stack.Navigator initialRouteName="PageHome">
+      <Stack.Screen
+        name="PageHome"
+        component={Home}
+        options={{ headerShown: false}}
+      />
+      <Stack.Screen
+        name="ManagerStaff"
+        component={ManagerStaff}
+        options={{ headerTitle: "Quản lý nhân viên" }}
+      />
+      <Stack.Screen
+        name="ManagerClient"
+        component={ManagerClient}
+        options={{ headerTitle: "Quản lý khách hàng" }}
+      />
+      <Stack.Screen
+        name="ManagerBill"
+        component={ManagerBill}
+        options={{ headerTitle: "Quản lý hóa đơn" }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{ headerTitle: "Đăng ký người dùng" }}
+      />
+    </Stack.Navigator>
+    </>
+  );
+};
+
 //profile
-const PageProfile = () =>{
-  return(
+const PageProfile = () => {
+  return (
     <Stack.Navigator initialRouteName="Profile">
-      <Stack.Screen name="Profile" component={Profile} options={{headerShown: false}}/>
-      <Stack.Screen name="ManagerClient" component={ManagerClient} options={{headerTitle: "Quản lý khách hàng"}}/>
-      <Stack.Screen name="ManagerBill" component={ManagerBill} options={{headerTitle: "Quản lý hóa đơn"}}/>
-      <Stack.Screen name="Register" component={Register} options={{headerTitle: "Đăng ký người dùng"}}/>
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
-}
+};
 
-const hideTabBar = (route)=>{
-  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile';
+const hideTabBar = (route) => {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
 
-  const screensToHideTabBar = ['ManagerClient', 'ManagerBill', 'Register'];
-  
+  const screensToHideTabBar = [
+    "ManagerClient",
+    "ManagerBill",
+    "Register",
+    "ManagerStaff",
+  ];
+
   if (screensToHideTabBar.includes(routeName)) {
-    return 'none';
+    return "none";
   }
-  return 'flex';
-}
+  return "flex";
+};
 
 const AppNavigator = () => {
   const { isLogin } = useContext(AppConText);
-  return (
-    <>
-      {isLogin == false ? <Users /> : <Main />}
-      
-    </>
-  );
+  return <>{isLogin == false ? <Users /> : <Main />}</>;
 };
 
 export default AppNavigator;
 
 const styles = StyleSheet.create({
   shadow: {
-    shadowColor: "#000",
+    position: "absolute",
+    borderWidth: 4,
+    borderColor: '#0E55A7',
+    bottom: 15,
+    left: 10,
+    right: 10,
+    elevation: 0,
+    borderRadius: 15,
+    height: 70,
+    shadowColor: "#0E55A7",
     shadowOffset: {
       width: 0,
       height: 4,
@@ -165,7 +206,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.32,
     shadowRadius: 5.46,
 
-    elevation: 9,
+    elevation: 5,
   },
   tabIcon: {
     justifyContent: "center",

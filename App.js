@@ -1,25 +1,20 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import SplashScreen from "./src/components/SplashScreen";
-import Login from "./src/components/Login";
+import { SafeAreaView, StatusBar, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AppConTextProvider } from "./src/util/AppContext";
 import AppNavigator from "./src/util/AppNavigator";
-import Toast, { BaseToast } from "react-native-toast-message";
-
-const Stack = createNativeStackNavigator();
+import Toast from "react-native-toast-message";
 
 export default function App() {
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor="white" barStyle="dark-content"/>
       <AppConTextProvider>
         <NavigationContainer>
           <AppNavigator></AppNavigator>
         </NavigationContainer>
       </AppConTextProvider>
-      <Toast/>
-    </>
+      <Toast />
+    </SafeAreaView>
   );
 }
 

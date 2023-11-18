@@ -18,17 +18,17 @@ import { AppConText } from "../util/AppContext";
 import Toast from "react-native-toast-message";
 
 const Login = () => {
+  
   const { setisLogin, setinforUser } = useContext(AppConText);
 
   const [emailUser, setemailUser] = useState("");
   const [passwordUser, setpasswordUser] = useState("");
 
   const goLogin = async () => {
-
     if (!emailUser || !passwordUser) {
       Toast.show({
         type: "info",
-        text1: "VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN."
+        text1: "VUI LÒNG NHẬP ĐẦY ĐỦ THÔNG TIN.",
       });
       return;
     }
@@ -43,27 +43,27 @@ const Login = () => {
         Toast.show({
           type: "success",
           text1: "ĐĂNG NHẬP THÀNH CÔNG",
-        })
+        });
         setisLogin(true);
         setinforUser(response);
       } else {
         Toast.show({
           type: "error",
-          text1: "SAI MẬT KHẨU!"
-        })
+          text1: "SAI MẬT KHẨU!",
+        });
       }
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "EMAIL KHÔNG TỒN TẠI!"
-      })
+        text1: "EMAIL KHÔNG TỒN TẠI!",
+      });
     }
   };
 
   const [isPasswordVisible, setisPasswordVisible] = useState(false);
   const [checked, setchecked] = useState(false);
 
-  const translateY = new Animated.Value(300);
+  const translateY = new Animated.Value(500);
 
   const togglePasswordVisibility = () => {
     setisPasswordVisible(!isPasswordVisible);
@@ -80,102 +80,96 @@ const Login = () => {
 
   return (
     //hình logo
-    <ScrollView>
-      <View style={styles.container}>
-        <Image
-          style={styles.img}
-          source={require("../img/backgroundSpl.jpg")}
-        />
-        <Image style={styles.imgFont} source={require("../img/fontBack.png")} />
+    <ScrollView style={styles.container}>
+      
+      <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
+      <Image style={styles.imgFont} source={require("../img/fontBack.png")} />
 
-        {/* form đăng nhập */}
-        <Animated.View style={{ transform: [{ translateY }] }}>
-          <View style={styles.fontLogin}>
-            <Text style={styles.loginText}>Đăng nhập</Text>
-            <View style={styles.bar} />
+      {/* form đăng nhập */}
+      <Animated.View style={{ transform: [{ translateY }] }}>
+        <View style={styles.fontLogin}>
+          <Text style={styles.loginText}>Đăng nhập</Text>
+          <View style={styles.bar} />
 
-            {/* EMAIL */}
-            <View>
-              <View style={styles.inputEmail}>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder="example@gmail.com"
-                  onChangeText={setemailUser}
-                >
-                  hoangdbk03@gmail.com
-                </TextInput>
-              </View>
-              <View style={styles.viewLabelEmail}>
-                <Text Text style={styles.label}>
-                  Email
-                </Text>
-              </View>
-            </View>
-
-            {/* Password */}
-            <View>
-              <View style={styles.inputPass}>
-                <TextInput
-                  style={styles.textInput}
-                  label="Mật khẩu"
-                  secureTextEntry={!isPasswordVisible}
-                  placeholder="*************"
-                  onChangeText={setpasswordUser}
-                >
-                  123
-                </TextInput>
-                <TouchableOpacity
-                  style={styles.passwordVisibilityIcon}
-                  onPress={togglePasswordVisibility}
-                >
-                  <Icon
-                    name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color="#0E55A7"
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.viewLabelPass}>
-                <Text Text style={styles.label}>
-                  Mật khẩu
-                </Text>
-              </View>
-            </View>
-
-            {/* checkbox và quên mật khẩu */}
-            <View style={styles.checkBox}>
-              <View style={styles.checkBox}>
-                <Checkbox
-                  status={checked ? "checked" : "unchecked"}
-                  onPress={() => {
-                    setchecked(!checked);
-                  }}
-                  color="#0E55A7"
-                  uncheckedColor="#0E55A7"
-                />
-                <Text style={{ color: "#0E55A7", top: 8 }}>
-                  Ghi nhớ mật khẩu
-                </Text>
-              </View>
-              <Text
-                style={{
-                  marginLeft: 70,
-                  top: 12,
-                  color: "#0E55A7",
-                  textDecorationLine: "underline",
-                }}
+          {/* EMAIL */}
+          <View>
+            <View style={styles.inputEmail}>
+              <TextInput
+                style={styles.textInput}
+                placeholder="example@gmail.com"
+                onChangeText={setemailUser}
               >
-                Quên mật khẩu?
+                hoangdbk03@gmail.com
+              </TextInput>
+            </View>
+            <View style={styles.viewLabelEmail}>
+              <Text Text style={styles.label}>
+                Email
               </Text>
             </View>
-
-            {/* Button đăng nhập */}
-            <TouchableOpacity style={styles.buttonLogin} onPress={goLogin}>
-              <Text style={styles.textButton}>Đăng nhập</Text>
-            </TouchableOpacity>
           </View>
-        </Animated.View>
-      </View>
+
+          {/* Password */}
+          <View>
+            <View style={styles.inputPass}>
+              <TextInput
+                style={styles.textInput}
+                label="Mật khẩu"
+                secureTextEntry={!isPasswordVisible}
+                placeholder="*************"
+                onChangeText={setpasswordUser}
+              >
+                123
+              </TextInput>
+              <TouchableOpacity
+                style={styles.passwordVisibilityIcon}
+                onPress={togglePasswordVisibility}
+              >
+                <Icon
+                  name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#0E55A7"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.viewLabelPass}>
+              <Text Text style={styles.label}>
+                Mật khẩu
+              </Text>
+            </View>
+          </View>
+
+          {/* checkbox và quên mật khẩu */}
+          <View style={styles.checkBox}>
+            <View style={styles.checkBox}>
+              <Checkbox
+                status={checked ? "checked" : "unchecked"}
+                onPress={() => {
+                  setchecked(!checked);
+                }}
+                color="#0E55A7"
+                uncheckedColor="#0E55A7"
+              />
+              <Text style={{ color: "#0E55A7", top: 8 }}>Ghi nhớ mật khẩu</Text>
+            </View>
+            <Text
+              style={{
+                marginLeft: 70,
+                top: 12,
+                color: "#0E55A7",
+                textDecorationLine: "underline",
+              }}
+            >
+              Quên mật khẩu?
+            </Text>
+          </View>
+
+          {/* Button đăng nhập */}
+          <TouchableOpacity style={styles.buttonLogin} onPress={goLogin}>
+            <Text style={styles.textButton}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
     </ScrollView>
   );
 };
@@ -188,8 +182,8 @@ const styles = StyleSheet.create({
   },
   img: {
     width: "100%",
-    height: 225,
-    marginTop: 80,
+    height:  225,
+    marginTop: 30,
   },
   imgFont: {
     width: "100%",
@@ -198,18 +192,19 @@ const styles = StyleSheet.create({
   },
   fontLogin: {
     width: "100%",
-    maxHeight: "100%",
     backgroundColor: "white",
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     marginTop: 50,
     alignItems: "center",
+    height: "100%",
   },
   loginText: {
     color: "#0E55A7",
     fontWeight: "400",
     fontSize: 26,
     marginTop: 30,
+    fontFamily: 'Bold'
   },
   bar: {
     width: 110,

@@ -1,7 +1,6 @@
 import { Animated, Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import Login from "./Login";
 import * as Animatable from "react-native-animatable";
 
 const SplashScreen = () => {

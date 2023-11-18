@@ -4,10 +4,18 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableNativeFeedback,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { Component, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { AppConText } from "../util/AppContext";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Client from "../components/Client";
@@ -16,45 +24,38 @@ import { vi } from "date-fns/locale";
 import "intl";
 import "intl/locale-data/jsonp/vi";
 import { format } from "date-fns";
-import AxiosIntance from "../util/AxiosIntance";
-
-const TabTop = createMaterialTopTabNavigator();
-
-const CustomTab = ({ label, imageSource, isFocused, onPress }) => (
-  <TouchableOpacity onPress={onPress}>
-    <Image
-      source={imageSource}
-      style={{
-        width: 30,
-        height: 30,
-        tintColor: isFocused ? "#0E55A7" : "black",
-      }}
-    />
-    <Text style={{ color: isFocused ? "#0E55A7" : "black" }}>{label}</Text>
-  </TouchableOpacity>
-);
+import { useNavigation } from "@react-navigation/native";
+import FloatingButton from "../items/FloatingButton";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import Modal from "react-native-modal";
+import { List } from "react-native-paper";
 
 const Home = () => {
-  const [data, setData] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation();
+  const { inforUser } = useContext(AppConText);
+  const [isModalVisible, setModalVisible] = useState(false);
 
-  const fetchDataFromServer = async () => {
-    try {
-      const response = await AxiosIntance().get("/user/list/update/");
-      const newData = await response;
-
-      setData(newData);
-      setRefreshing(false);
-    } catch (error) {}
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
-  const handleRefreshData = () => {
-    setRefreshing(true);
-    fetchDataFromServer();
-  };
+  //tab top
+  const TabTop = createMaterialTopTabNavigator();
+  const CustomTab = ({ label, imageSource, isFocused, onPress }) => (
+    <TouchableOpacity onPress={onPress}>
+      <Image
+        source={imageSource}
+        style={{
+          width: 30,
+          height: 30,
+          tintColor: isFocused ? "#0E55A7" : "black",
+        }}
+      />
+      <Text style={{ color: isFocused ? "#0E55A7" : "black" }}>{label}</Text>
+    </TouchableOpacity>
+  );
 
   useEffect(() => {
-    fetchDataFromServer();
     // Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt
     if (Platform.OS === "android") {
       require("intl/locale-data/jsonp/vi");
@@ -63,25 +64,20 @@ const Home = () => {
 
   // Lấy ngày hiện tại
   const today = new Date();
-
   const dayName = format(today, "EEEE", { locale: vi });
   const dayOfMonth = format(today, "d MMMM yyyy", { locale: vi });
 
-  const { inforUser } = useContext(AppConText);
-
   return (
-    <View style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
       {/* phần header avatar, ngày tháng và background */}
-      <ScrollView refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefreshData} />
-      }>
+      <View style={{ width: "100%" }}>
         <View style={styles.header}>
           <View style={styles.daymon_avatar}>
-            <View style={{ width: 300 }}>
+            <View style={{ width: "85%" }}>
               <Text style={styles.day}>{dayName}</Text>
               <Text style={styles.daymon}>Ngày {dayOfMonth}</Text>
             </View>
-            <View style={styles.conavatar}>
+            <View>
               {inforUser.avatar ? (
                 <Image
                   style={styles.avatar}
@@ -97,21 +93,20 @@ const Home = () => {
           </View>
           <Image
             style={styles.logoHome}
-            source={require("../img/logoHome.jpg")}
+            source={require("../img/logoHome.png")}
           />
         </View>
-      </ScrollView>
+      </View>
 
       {/* phần thân */}
       <View style={styles.body}>
         <TabTop.Navigator
-          style={{ marginTop: 50 }}
+          style={{ marginTop: 30 }}
           initialRouteName="Client"
           screenOptions={{
             tabBarInactiveTintColor: "black",
             tabBarLabelStyle: { textTransform: "none" },
             tabBarIconStyle: { height: 35 },
-            ...styles.tabTop,
           }}
         >
           <TabTop.Screen
@@ -145,7 +140,7 @@ const Home = () => {
 
       {/* khung button nhân viên và gói chụp */}
       <View style={styles.mid_header_body}>
-        <TouchableOpacity style={styles.itemMid}>
+        <TouchableOpacity style={styles.itemMid} onPress={toggleModal}>
           <Image
             style={styles.iconMid}
             source={require("../icons/card_staff.png")}
@@ -168,7 +163,27 @@ const Home = () => {
           <Text style={styles.textMid}>Dịch vụ</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      <FloatingButton />
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={toggleModal}
+        style={styles.modal}
+      >
+        <View style={styles.modalContent}>
+          <View>
+            <TouchableOpacity style={styles.lineModal} onPress={toggleModal}>
+              <View style={styles.line} />
+            </TouchableOpacity>
+            <List.Item
+              style={{backgroundColor: 'red'}}
+              title="Nhân viên"
+              description="Quản lý thông tin nhân viên"
+              left={(props) => <List.Icon {...props} icon="folder" />}
+            />
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaProvider>
   );
 };
 
@@ -181,13 +196,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   logoHome: {
-    width: 390,
+    width: "100%",
     height: 150,
   },
   header: {
     height: 300,
-    marginTop: 40,
-    backgroundColor: "#fafbfd",
+    backgroundColor: "#e9e9e9",
   },
   avatar: {
     width: 40,
@@ -195,36 +209,29 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: "white",
   },
-  conavatar: {
-    backgroundColor: "#5e5e5e",
-    width: 42,
-    height: 42,
-    borderRadius: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   daymon_avatar: {
     flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 20,
     marginTop: 20,
+    marginHorizontal: 20,
   },
   day: {
-    color: "#7F7F7F",
+    color: "#45576c",
     fontSize: 18,
   },
   daymon: {
     fontSize: 20,
+    color: "#313e4d",
   },
   body: {
     flex: 1,
-    width: "95%",
-    height: "55%",
+    width: "100%",
+    height: 500,
     backgroundColor: "white",
     position: "absolute",
-    marginTop: 285,
+    marginTop: 245,
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
+    padding: 10,
   },
   mid_header_body: {
     width: "85%",
@@ -232,7 +239,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
     position: "absolute",
     flexDirection: "row",
-    top: 270,
+    top: 220,
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
@@ -259,5 +266,30 @@ const styles = StyleSheet.create({
     height: 28,
     marginStart: 10,
     top: 4,
+  },
+  modal: {
+    justifyContent: "flex-end",
+    margin: 0,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 5,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: "30%",
+  },
+  line: {
+    width: 50,
+    height: 6,
+    backgroundColor: "#062446",
+    borderRadius: 2,
+  },
+  lineModal: {
+    width: "100%",
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 });

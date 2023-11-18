@@ -9,42 +9,53 @@ import {
 import React, { useState } from "react";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Modal from "react-native-modal";
+import { styleModal } from "../style/styleModal";
 
 const ItemListClientAdmin = (props) => {
+  //truyền item và index
   const { item, index } = props;
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
 
+  //ẩn modal
   const toggleDeleteModal = () => {
     setDeleteModalVisible(!isDeleteModalVisible);
   };
 
+  //truyền item._id đi 
   const handleDelete = () => {
     props.onDelete(item._id);
     toggleDeleteModal();
   };
 
+  //phần front-end
   return (
     <View style={styles.container}>
-      <Text>{index + 1}</Text>
+      <Text style={{ fontWeight: "bold", color: '#0E55A7' }}>{index + 1}</Text>
       <View style={styles.infor}>
-        <Text>{item.name}</Text>
-        <Text>{item.phone}</Text>
+        <Text style={{ color: "#313e4d"}}>
+          {item.name}
+        </Text>
+        <Text style={{ color: "#313e4d"}}>{item.phone}</Text>
       </View>
       <TouchableOpacity onPress={toggleDeleteModal}>
-        <MaterialIcons name="delete" size={20} />
+        <MaterialIcons name="delete" size={25} color={"#fc6261"} />
       </TouchableOpacity>
-      <Modal isVisible={isDeleteModalVisible} style={styles.modalContainer}>
+      <Modal isVisible={isDeleteModalVisible} style={styleModal.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.textModal}>Xác nhận</Text>
-          <Text>Xóa khách hàng {item.name}</Text>
-          <View style={styles.buttonModal}>
-            <Text style={styles.button} onPress={toggleDeleteModal}>
-              Hủy
-            </Text>
-            <Text style={{ width: 20 }} />
-            <Text style={styles.button} onPress={handleDelete}>
-              Xác nhận
-            </Text>
+          <View style={styles.textModal}>
+            <Text>Bạn chắc chắn muốn xóa khách hàng</Text>
+            <Text style={{color: '#0E55A7', fontWeight: 'bold'}}>{item.name}</Text>
+          </View>
+          <View style={styleModal.buttonModal}>
+            <TouchableOpacity
+              onPress={toggleDeleteModal}
+              style={styleModal.button1}
+            >
+              <Text style={styleModal.textButton1}>Không</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete} style={styleModal.button2}>
+              <Text style={styleModal.textButton2}>Đồng ý</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -59,7 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "white",
     padding: 20,
-    borderTopWidth: 1,
+    borderTopWidth: 0.8,
     borderColor: "#cfcfcf",
     justifyContent: "space-between",
     alignItems: "center",
@@ -67,31 +78,15 @@ const styles = StyleSheet.create({
   infor: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: 230,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 5,
-    width: 300,
-  },
-  buttonModal: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 10,
+    width: '80%',
   },
   textModal: {
-    fontSize: 18,
-    color: "red",
-    fontWeight: "bold",
+    padding: 10,
   },
-  button: {
-    borderWidth: 0.5,
-    padding: 8,
+  modalContent:{
+    backgroundColor: "white",
+    borderRadius: 5,
+    width: '100%'
   },
+  
 });
