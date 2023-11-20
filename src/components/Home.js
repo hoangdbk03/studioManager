@@ -39,6 +39,17 @@ const Home = () => {
     setModalVisible(!isModalVisible);
   };
 
+  const handleNextStaff = () => {
+    setModalVisible(false);
+
+    navigation.navigate("ManagerStaff");
+  };
+  const handleNextSalary = () => {
+    setModalVisible(false);
+
+    //navigation.navigate("ManagerStaff");
+  };
+
   //tab top
   const TabTop = createMaterialTopTabNavigator();
   const CustomTab = ({ label, imageSource, isFocused, onPress }) => (
@@ -174,12 +185,48 @@ const Home = () => {
             <TouchableOpacity style={styles.lineModal} onPress={toggleModal}>
               <View style={styles.line} />
             </TouchableOpacity>
-            <List.Item
-              style={{backgroundColor: 'red'}}
-              title="Nhân viên"
-              description="Quản lý thông tin nhân viên"
-              left={(props) => <List.Icon {...props} icon="folder" />}
-            />
+            <TouchableOpacity
+              onPress={inforUser.role !== "Nhân viên" ? handleNextStaff : null}
+              style={[
+                styles.fontItemModal,
+                inforUser.role === "Nhân viên" && styles.disabledItem,
+              ]}
+            >
+              <List.Item
+                title="Nhân viên"
+                description="Quản lý thông tin nhân viên"
+                left={(props) => (
+                  <List.Icon
+                    {...props}
+                    icon={({ size, color }) => (
+                      <Image
+                        source={require("../icons/card_staff.png")}
+                        style={{ width: size, height: size, tintColor: color }}
+                      />
+                    )}
+                    color="#062446"
+                  />
+                )}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.fontItemModal}>
+              <List.Item
+                title="Lương"
+                description="Lương nhân viên"
+                left={(props) => (
+                  <List.Icon
+                    {...props}
+                    icon={({ size, color }) => (
+                      <Image
+                        source={require("../icons/salary.png")}
+                        style={{ width: size, height: size, tintColor: color }}
+                      />
+                    )}
+                    color="#062446"
+                  />
+                )}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -273,10 +320,10 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "white",
-    padding: 5,
+    padding: 15,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: "30%",
+    height: "35%",
   },
   line: {
     width: 50,
@@ -286,10 +333,28 @@ const styles = StyleSheet.create({
   },
   lineModal: {
     width: "100%",
-    height: 20,
+    height: 5,
     justifyContent: "center",
     alignItems: "center",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  fontItemModal: {
+    backgroundColor: "#e7eef6",
+    borderRadius: 10,
+    marginTop: 15,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 1,
+  },
+  disabledItem: {
+    opacity: 0.5,
+    pointerEvents: "none",
   },
 });

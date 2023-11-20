@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: 26,
     marginTop: 30,
-    fontFamily: 'Bold'
   },
   bar: {
     width: 110,
