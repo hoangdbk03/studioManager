@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Animated,
   Easing,
   Image,
@@ -23,6 +24,7 @@ const Login = () => {
 
   const [emailUser, setemailUser] = useState("");
   const [passwordUser, setpasswordUser] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const goLogin = async () => {
     if (!emailUser || !passwordUser) {
@@ -34,6 +36,7 @@ const Login = () => {
     }
 
     try {
+      setLoading(true);
       const response = await AxiosIntance().post("/user/login", {
         email: emailUser,
         password: passwordUser,
@@ -57,6 +60,8 @@ const Login = () => {
         type: "error",
         text1: "EMAIL KHÔNG TỒN TẠI!",
       });
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -170,6 +175,11 @@ const Login = () => {
           </TouchableOpacity>
         </View>
       </Animated.View>
+      {loading && (
+        <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0E55A7" />
+      </View>
+      )}
     </ScrollView>
   );
 };
@@ -274,5 +284,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
     fontWeight: "400",
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent white background
   },
 });

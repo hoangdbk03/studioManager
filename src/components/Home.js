@@ -166,7 +166,7 @@ const Home = () => {
             borderRadius: 20,
           }}
         ></View>
-        <TouchableOpacity style={styles.itemMid}>
+        <TouchableOpacity onPress={() => navigation.navigate('ManagerService')} style={styles.itemMid}>
           <Image
             style={styles.iconMid}
             source={require("../icons/camera.png")}

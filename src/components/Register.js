@@ -12,7 +12,7 @@ import Ant from "react-native-vector-icons/AntDesign";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
-import { useNavigation } from "@react-navigation/native";
+
 
 const dataRole = [
   { label: "Quản lý", value: "1" },
@@ -57,7 +57,7 @@ const Register = () => {
   };
 
   const isNameValid = (name) => {
-    const nameRegex = /^[a-zA-Z\s]+$/;
+    const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
     return nameRegex.test(name);
   };
 

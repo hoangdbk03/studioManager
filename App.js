@@ -3,9 +3,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { AppConTextProvider } from "./src/util/AppContext";
 import AppNavigator from "./src/util/AppNavigator";
 import Toast from "react-native-toast-message";
+import { PaperProvider } from 'react-native-paper';
 
 export default function App() {
   return (
+    <PaperProvider>
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor="white" barStyle="dark-content"/>
       <AppConTextProvider>
@@ -15,6 +17,7 @@ export default function App() {
       </AppConTextProvider>
       <Toast />
     </SafeAreaView>
+    </PaperProvider>
   );
 }
 

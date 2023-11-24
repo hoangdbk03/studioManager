@@ -17,6 +17,8 @@ import ManagerBill from "../components/ManagerBill";
 import ManagerStaff from "../components/ManagerStaff";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import FloatingButton from "../items/FloatingButton";
+import DetailStaff from "../components/DetailStaff";
+import ManagerService from "../components/ManagerService";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -119,34 +121,75 @@ const Main = () => {
 const PageHome = () => {
   return (
     <>
-    <FloatingButton/>
-    <Stack.Navigator initialRouteName="PageHome">
-      <Stack.Screen
-        name="PageHome"
-        component={Home}
-        options={{ headerShown: false}}
-      />
-      <Stack.Screen
-        name="ManagerStaff"
-        component={ManagerStaff}
-        options={{ headerTitle: "Quản lý nhân viên" }}
-      />
-      <Stack.Screen
-        name="ManagerClient"
-        component={ManagerClient}
-        options={{ headerTitle: "Quản lý khách hàng" }}
-      />
-      <Stack.Screen
-        name="ManagerBill"
-        component={ManagerBill}
-        options={{ headerTitle: "Quản lý hóa đơn" }}
-      />
-      <Stack.Screen
-        name="Register"
-        component={Register}
-        options={{ headerTitle: "Đăng ký người dùng" }}
-      />
-    </Stack.Navigator>
+      <FloatingButton />
+      <Stack.Navigator initialRouteName="PageHome">
+        <Stack.Screen
+          name="PageHome"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ManagerStaff"
+          component={ManagerStaff}
+          options={{
+            headerTitle: "Quản lý nhân viên",
+            headerBackTitle: "Quay lại",
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="DetailStaff"
+          component={DetailStaff}
+          options={{
+            headerTitle: "Thông tin nhân viên",
+            headerStyle: { backgroundColor: "#062446", elevation: 0},
+            headerTitleAlign: "center",
+            headerTintColor: "white",
+            headerBackTitle: "Quay lại",
+            presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="ManagerService"
+          component={ManagerService}
+          options={{
+            headerTitle: "Dịch vụ",
+            headerBackTitle: "Quay lại",
+            headerTitleAlign: "center",
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="ManagerClient"
+          component={ManagerClient}
+          options={{
+            headerTitle: "Quản lý khách hàng",
+            headerBackTitle: "Quay lại",
+            headerTitleAlign: "center",
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="ManagerBill"
+          component={ManagerBill}
+          options={{
+            headerTitle: "Quản lý hóa đơn",
+            headerBackTitle: "Quay lại",
+            headerTitleAlign: "center",
+            presentation: 'modal'
+          }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{
+            headerTitle: "Đăng ký người dùng",
+            headerBackTitle: "Quay lại",
+            headerTitleAlign: "center",
+            presentation: 'modal'
+          }}
+        />
+      </Stack.Navigator>
     </>
   );
 };
@@ -172,6 +215,8 @@ const hideTabBar = (route) => {
     "ManagerBill",
     "Register",
     "ManagerStaff",
+    "DetailStaff",
+    "ManagerService",
   ];
 
   if (screensToHideTabBar.includes(routeName)) {
@@ -191,7 +236,7 @@ const styles = StyleSheet.create({
   shadow: {
     position: "absolute",
     borderWidth: 4,
-    borderColor: '#0E55A7',
+    borderColor: "#0E55A7",
     bottom: 15,
     left: 10,
     right: 10,

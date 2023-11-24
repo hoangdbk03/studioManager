@@ -4,17 +4,28 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Avatar } from "react-native-paper";
+import { Avatar, Modal, Portal } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { Skeleton } from "moti/skeleton";
 import Animated, { FadeIn, Layout } from "react-native-reanimated";
+import { useNavigation } from "@react-navigation/native";
 
 const ItemListStaff = (props) => {
-  const { item } = props;
+  const { item, onDelete } = props;
+  const navigation = useNavigation();
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const handleLongPress = () => {
+    setModalVisible(true);
+  };
+  const hideModal = () => {
+    setModalVisible(false);
+  };
 
   const handlePhonePress = () => {
     if (item.phone) {
@@ -22,6 +33,15 @@ const ItemListStaff = (props) => {
       Linking.openURL(phoneUrl);
     }
   };
+
+  const handleDetailStaff = () => {
+    navigation.navigate("DetailStaff", { item });
+  };
+
+  const handleDelete = () =>{
+    onDelete(item._id);
+    hideModal();
+  }
 
   const skeletonStyle = {
     colorMode: "light",
@@ -33,98 +53,140 @@ const ItemListStaff = (props) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Skeleton.Group show={item == null}>
-        <View style={styles.header}>
-          <Skeleton width={60} height={60} radius={"round"} {...skeletonStyle}>
-            {item && (
-              <Animated.View layout={Layout} entering={FadeIn.duration(1500)}>
-                <Avatar.Image
-                  style={styles.frameAvatar}
-                  size={60}
-                  source={{ uri: item.avatar }}
-                />
-              </Animated.View>
-            )}
-          </Skeleton>
-          <View style={styles.name_email}>
-            <View>
-              <Skeleton width={"60%"} height={20} {...skeletonStyle}>
-                {item && (
-                  <Animated.View
-                    layout={Layout}
-                    entering={FadeIn.duration(1500)}
-                  >
-                    <Text style={styles.textName}>{item.name}</Text>
-                  </Animated.View>
-                )}
-              </Skeleton>
-            </View>
-            <View style={{ marginTop: 3 }}>
-              <Skeleton width={"60%"} height={10} {...skeletonStyle}>
-                {item && (
-                  <Animated.View
-                    layout={Layout}
-                    entering={FadeIn.duration(1500)}
-                  >
-                    <Text style={styles.textEmail}>{item.email}</Text>
-                  </Animated.View>
-                )}
-              </Skeleton>
+    <TouchableWithoutFeedback onLongPress={handleLongPress}>
+      <View style={styles.container}>
+        <Skeleton.Group show={item == null}>
+          <View style={styles.header}>
+            <Skeleton
+              width={60}
+              height={60}
+              radius={"round"}
+              {...skeletonStyle}
+            >
+              {item && (
+                <Animated.View layout={Layout} entering={FadeIn.duration(1500)}>
+                  <Avatar.Image
+                    style={styles.frameAvatar}
+                    size={60}
+                    source={
+                      item && item.avatar
+                        ? { uri: item.avatar }
+                        : require("../icons/user.png")
+                    }
+                  />
+                </Animated.View>
+              )}
+            </Skeleton>
+            <View style={styles.name_email}>
+              <View>
+                <Skeleton width={"60%"} height={20} {...skeletonStyle}>
+                  {item && (
+                    <Animated.View
+                      layout={Layout}
+                      entering={FadeIn.duration(1500)}
+                    >
+                      <Text style={styles.textName}>{item.name}</Text>
+                    </Animated.View>
+                  )}
+                </Skeleton>
+              </View>
+              <View style={{ marginTop: 3 }}>
+                <Skeleton width={"60%"} height={10} {...skeletonStyle}>
+                  {item && (
+                    <Animated.View
+                      layout={Layout}
+                      entering={FadeIn.duration(1500)}
+                    >
+                      <Text style={styles.textEmail}>{item.email}</Text>
+                    </Animated.View>
+                  )}
+                </Skeleton>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={{ marginTop: 5 }}>
-          <Skeleton width={"100%"} height={30} {...skeletonStyle}>
-            {item && (
-              <Animated.View layout={Layout} entering={FadeIn.duration(1500)}>
-                <View style={styles.contact}>
-                  <View style={styles.role}>
-                    <Image
-                      style={{ width: 20, height: 20 }}
-                      source={require("../icons/card_staff.png")}
-                    />
-                    {item && <Text style={styles.textRole}>{item.role}</Text>}
+          <View style={{ marginTop: 5 }}>
+            <Skeleton width={"100%"} height={30} {...skeletonStyle}>
+              {item && (
+                <Animated.View layout={Layout} entering={FadeIn.duration(1500)}>
+                  <View style={styles.contact}>
+                    <View style={styles.role}>
+                      <Image
+                        style={{ width: 20, height: 20 }}
+                        source={require("../icons/card_staff.png")}
+                      />
+                      {item && <Text style={styles.textRole}>{item.role}</Text>}
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <FontAwesome5 name="phone-alt" />
+                      <Text
+                        onPress={handlePhonePress}
+                        style={{ fontSize: 13, marginStart: 5, color: item.phone ? 'black' : 'gray' }}
+                      >
+                        {item.phone || 'Chưa cập nhật'}
+                      </Text>
+                    </View>
                   </View>
-                  <View style={{ flexDirection: "row" }}>
-                    <Text style={{ color: "#062446", fontSize: 13 }}>
-                      Liên hệ:{" "}
-                    </Text>
-                    <Text onPress={handlePhonePress} style={{ fontSize: 13 }}>
-                      {item.phone}
-                    </Text>
-                  </View>
-                </View>
-              </Animated.View>
-            )}
-          </Skeleton>
-        </View>
+                </Animated.View>
+              )}
+            </Skeleton>
+          </View>
 
-        <View style={{ marginTop: 5 }}>
+          <View
+            style={{
+              width: "100%",
+              alignItems: "center",
+              marginTop: 3,
+              marginBottom: 3,
+            }}
+          >
+            <View
+              style={{ height: 1, width: "95%", backgroundColor: "#e6e6e6" }}
+            />
+          </View>
           <Skeleton width={"100%"} height={25} {...skeletonStyle}>
-            {item && (
-              <View style={styles.detailUser}>
-                <TouchableOpacity
-                  style={{ flexDirection: "row", alignItems: "center" }}
-                >
-                  <FontAwesome5 name="user-alt" size={12} color={"#90b1d7"} />
-                  <Text style={{ color: "#90b1d7", marginStart: 5 }}>
-                    Xem chi tiết...
-                  </Text>
-                </TouchableOpacity>
-                <MaterialIcons
-                  name="navigate-next"
-                  size={20}
-                  color={"#90b1d7"}
-                  style={{ marginEnd: 10 }}
-                />
-              </View>
-            )}
+            <TouchableOpacity onPress={handleDetailStaff}>
+              {item && (
+                <View style={styles.detailUser}>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <FontAwesome5 name="user-alt" size={12} color={"#90b1d7"} />
+                    <Text
+                      style={{ color: "#90b1d7", marginStart: 5, fontSize: 13 }}
+                    >
+                      Xem chi tiết...
+                    </Text>
+                  </View>
+                  <MaterialIcons
+                    name="navigate-next"
+                    size={20}
+                    color={"#90b1d7"}
+                    style={{ marginEnd: 10 }}
+                  />
+                </View>
+              )}
+            </TouchableOpacity>
           </Skeleton>
-        </View>
-      </Skeleton.Group>
-    </View>
+        </Skeleton.Group>
+        <Portal>
+          <Modal
+            visible={isModalVisible}
+            onDismiss={hideModal}
+            contentContainerStyle={styles.modalContainer}
+          >
+            <TouchableOpacity onPress={handleDelete} style={styles.frameText}>
+              <Text>Xóa</Text>
+              {item && (
+                <Text>
+                  [{item.role}] {item.name}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </Modal>
+        </Portal>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -168,9 +230,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 1.41,
-    
+
     elevation: 2,
   },
   textName: {
@@ -199,5 +261,30 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 5,
     marginStart: 10,
+  },
+  dots: {
+    position: "absolute",
+    alignSelf: "flex-end",
+    marginTop: 10,
+    end: 10,
+  },
+  modalContainer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  frameText: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    backgroundColor: "#e7eef6",
+    height: 50,
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 10,
   },
 });
