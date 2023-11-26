@@ -1,19 +1,21 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { AppConText } from "../util/AppContext";
 import Toast from "react-native-toast-message";
 import AxiosIntance from "../util/AxiosIntance";
 
 const ItemListService = (props) => {
-  const { item, onAddToCart } = props;
+  const { item, onAddToCart, onRemoveFromCart } = props;
   const { inforUser } = useContext(AppConText);
+  const [inCart, setInCart] = useState(false);
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", {
+    const formattedPrice = new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(price);
+    return formattedPrice.replace(/\s₫/g, "");
   };
 
   const addToCart = async () => {
@@ -23,16 +25,25 @@ const ItemListService = (props) => {
     };
 
     try {
-      await AxiosIntance().post("/cart/addServiceToCart/", idAddCart);
-      onAddToCart();
-      Toast.show({
-        type: "success",
-        text1: "Thêm thành công vào giỏ hàng",
-      });
+      if (inCart) {
+        await AxiosIntance().delete("/cart/removeServiceFromCart/",  {
+          data: idAddCart,
+        });
+        onRemoveFromCart();
+      } else {
+        await AxiosIntance().post("/cart/addServiceToCart/", idAddCart);
+        onAddToCart();
+        Toast.show({
+          type: "success",
+          text1: "Thêm thành công vào giỏ hàng",
+        });
+        onAddToCart();
+      }
+      setInCart(!inCart);
     } catch (error) {
       Toast.show({
-        type: "error",
-        text1: "Thêm thất bại",
+        type: "info",
+        text1: "Dịch vụ đã tồn tại trong giỏ hàng",
       });
     }
   };
@@ -46,11 +57,11 @@ const ItemListService = (props) => {
         </Text>
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <Text>Giá </Text>
-          <Text style={styles.textPrice}>{formatPrice(item.price)}</Text>
+          <Text style={styles.textPrice}>{formatPrice(item.price)}₫</Text>
         </View>
       </View>
       <TouchableOpacity style={styles.buttonAdd} onPress={addToCart}>
-        <Text style={styles.textButton}>Thêm vào hóa đơn</Text>
+        <Text style={styles.textButton}>{inCart ? "Hủy" : "Thêm vào giỏ hàng"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -95,5 +106,4 @@ const styles = StyleSheet.create({
     height: 50,
     color: "#0a3c77",
   },
-  textPrice: {},
 });

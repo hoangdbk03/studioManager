@@ -5,12 +5,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SplashScreen from "../components/SplashScreen";
 import Login from "../components/Login";
 import Home from "../components/Home";
-import Calendar from "../components/Calendar";
-import History from "../components/History";
+import Job from "../components/Job";
+import Cart from "../components/Cart";
 import Profile from "../components/Profile";
 import { AppConText } from "./AppContext";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import IonIcons from "react-native-vector-icons/Ionicons";
+import Foundation from "react-native-vector-icons/Foundation";
+import Feather from "react-native-vector-icons/Feather";
 import ManagerClient from "../components/ManagerClient";
 import Register from "../components/Register";
 import ManagerBill from "../components/ManagerBill";
@@ -68,31 +69,31 @@ const Main = () => {
         })}
       ></Tab.Screen>
       <Tab.Screen
-        name="Calendar"
-        component={Calendar}
+        name="Job"
+        component={Job}
         options={({ route }) => ({
-          title: "Lịch trình",
+          title: "Công việc",
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-            if (route.name == "Calendar") {
-              iconName = focused ? "calendar-outline" : "calendar-outline";
+            if (route.name == "Job") {
+              iconName = focused ? "clipboard-pencil" : "clipboard-pencil";
             }
-            return <IonIcons name={iconName} size={size} color={color} />;
+            return <Foundation name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}
       ></Tab.Screen>
       <Tab.Screen
-        name="History"
-        component={History}
+        name="Cart"
+        component={Cart}
         options={({ route }) => ({
-          title: "Lịch sử",
+          title: "Giỏ hàng",
           tabBarIcon: ({ focused, color }) => {
             let iconName;
-            if (route.name == "History") {
-              iconName = focused ? "history" : "history";
+            if (route.name == "Cart") {
+              iconName = focused ? "shopping-cart" : "shopping-cart";
             }
-            return <FontAwesome5 name={iconName} size={23} color={color} />;
+            return <Feather name={iconName} size={23} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}

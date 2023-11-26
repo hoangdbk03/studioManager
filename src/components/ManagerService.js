@@ -1,34 +1,51 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
 import ItemListService from "./ItemListService";
+import { Badge } from "react-native-paper";
+import Feather from "react-native-vector-icons/Feather";
+import { AppConText } from "../util/AppContext";
 
 const ManagerService = () => {
   const [data, setData] = useState([]);
   const [numColumns, setNumColumns] = useState(2);
-  const [addedServicesCount, setAddedServicesCount] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
+  const {inforUser} = useContext(AppConText);
 
-  const handleServiceAdded = () => {
-    setAddedServicesCount((prevCount) => prevCount + 1);
+  const handleAddToCart = () => {
+    fetchCartCount();
+  };
+
+  const handleRemoveFromCart = () => {
+    fetchCartCount();
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await AxiosIntance().get("/service/list");
-        const apiData = response;
-        setData(apiData);
-      } catch (error) {
-        Toast.show({
-          type: "error",
-          text1: "Không lấy được dữ liệu",
-        });
-      }
-    };
     fetchData();
+    fetchCartCount();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await AxiosIntance().get("/service/list");
+      const apiData = response;
+      setData(apiData);
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Không lấy được dữ liệu",
+      });
+    }
+  };
+
+  const fetchCartCount = async () => {
+      const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
+      const cartData = response;
+      const itemCount = Array.isArray(cartData.items) ? cartData.items.length : 0;
+      setCartCount(itemCount);
+  };
 
   return (
     <View style={styles.container}>
@@ -37,16 +54,26 @@ const ManagerService = () => {
         numColumns={numColumns}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <ItemListService item={item} onAddToCart={handleServiceAdded} />
+          <ItemListService item={item} onAddToCart={() => handleAddToCart()}
+          onRemoveFromCart={() => handleRemoveFromCart()}/>
         )}
       />
-      {addedServicesCount > 0 && (
-        <View
-          style={styles.frameCart}
-        >
-          <Text style={styles.textCart}>{`Số dịch vụ đã thêm: ${addedServicesCount}`}</Text>
-        </View>
-      )}
+      <TouchableOpacity style={styles.floatingCart}>
+        <Feather
+          name="shopping-cart"
+          color="white"
+          size={25}
+          style={{left: 3}}
+        />
+        {cartCount > 0 && (
+          <Badge
+            style={styles.badge}
+            size={20}
+          >
+            {cartCount}
+          </Badge>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -58,27 +85,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
-  frameCart:{
+  floatingCart: {
     position: "absolute",
-    bottom: 10,
-    left: 50,
-    right: 50,
-    backgroundColor: "white",
-    height: "10%",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 12,
-    },
-    shadowOpacity: 0.58,
-    shadowRadius: 16.0,
-
-    elevation: 24,
-    justifyContent: 'center',
-    padding: 10
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#0E55A7", // Change this to the desired background color
+    padding: 10,
+    borderRadius: 100,
+    flexDirection: "row",
+    alignItems: "center",
+    width: 56,
+    height: 56
   },
-  textCart: {
-    fontSize: 15,
-  }
+  badge: {
+    position: "absolute",
+    top: -1,
+    right: -2,
+    backgroundColor: "red", // Change this to the desired badge background color
+  },
 });
