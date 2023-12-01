@@ -1,10 +1,14 @@
 import {
+  Image,
+  Platform,
   StyleSheet,
+  ToastAndroid,
   TouchableHighlight,
   TouchableNativeFeedback,
   TouchableOpacity,
   View,
 } from "react-native";
+import { TextInput } from "react-native-paper";
 import React, { useContext, useEffect, useState } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import AxiosIntance from "../util/AxiosIntance";
@@ -15,10 +19,10 @@ import Feather from "react-native-vector-icons/Feather";
 import { AppConText } from "../util/AppContext";
 import { useNavigation } from "@react-navigation/native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useFocusEffect } from "@react-navigation/native";
-import { Modal } from "react-native-paper";
+import Modal from "react-native-modal";
 import { Text } from "react-native";
 import { styleModal } from "../style/styleModal";
+import * as ImagePicker from "expo-image-picker";
 
 const ManagerService = () => {
   const [data, setData] = useState([]);
@@ -27,29 +31,163 @@ const ManagerService = () => {
   const [cartCount, setCartCount] = useState(0);
   const { inforUser } = useContext(AppConText);
   const [isModalAdd, setModalAdd] = useState(false);
+  const [isModalUpdate, setModalUpdate] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
-  const toggleModalAdd = () => {
-    setModalAdd(!isModalAdd);
-  };
-
+  // * lưu trữ dữ liệu thêm
   const [dataAdd, setDataAdd] = useState({
-    image: "",
     name: "",
     description: "",
     price: "",
   });
+  // * lưu trữ dữ liệu cập nhật
+  const [dataEdit, setDataEdit] = useState({
+    name: "",
+    description: "",
+    price: "",
+  });
+  // * hiển thị modal thêm dịch vụ
+  const toggleModalAdd = () => {
+    setModalAdd(!isModalAdd);
+    if (!isModalAdd) {
+      setImageUri(null);
+    }
+  };
+  // * hiển thị modal cập nhật dịch vụ
+  const toggleModalUpdate = () => {
+    setModalUpdate(!isModalUpdate);
+  };
+
+  /**
+   * TODO: Xử lý API
+   */
+
+  // TODO: xử lý thêm dịch vụ
+  // * Mở thư viện chọn hình ảnh
+  const openImageLibrary = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+      console.log("uri===>", result.assets[0].uri);
+      setDataAdd({ ...dataAdd, image: result.assets[0].uri });
+      setDataEdit({ ...dataAdd, image: result.assets[0].uri });
+    }
+  };
+  // * xử lý api thêm
+  const addService = async () => {
+    try {
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("name", dataAdd.name);
+      formData.append("description", dataAdd.description);
+      formData.append("price", dataAdd.price);
+
+      // Check if an image is selected before appending to FormData
+      if (imageUri) {
+        const imageUriParts = imageUri.split(".");
+        const imageFileType = imageUriParts[imageUriParts.length - 1];
+        const imageName = `service_image_${Date.now()}.${imageFileType}`;
+        formData.append("image", {
+          uri: imageUri,
+          name: imageName,
+          type: `image/${imageFileType}`,
+        });
+      }
+
+      await AxiosIntance().post("/service/create/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      Toast.show({
+        type: "success",
+        text1: "Thêm thành công.",
+      });
+      toggleModalAdd();
+      fetchData();
+    } catch (error) {
+      toggleModalAdd();
+      console.log("Add Service Error: ", error);
+      Toast.show({
+        type: "error",
+        text1: "Thêm thất bại.",
+      });
+    }
+  };
+  // TODO: Xử lý API cập nhật dịch vụ
+  const updateService = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("name", dataEdit.name);
+      formData.append("description", dataEdit.description);
+      formData.append("price", dataEdit.price);
+
+      // Check if an image is selected before appending to FormData
+      if (imageUri) {
+        const imageUriParts = imageUri.split(".");
+        const imageFileType = imageUriParts[imageUriParts.length - 1];
+        const imageName = `service_image_${Date.now()}.${imageFileType}`;
+        formData.append("image", {
+          uri: imageUri,
+          name: imageName,
+          type: `image/${imageFileType}`,
+        });
+      }
+
+      await AxiosIntance().put("/service/update/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      Toast.show({
+        type: "success",
+        text1: "Cập nhật thành công",
+      });
+      toggleModalUpdate();
+    } catch (error) {
+      console.log("Update error", error);
+      Toast.show({
+        type: "error",
+        text1: "Cập nhật thất bại!",
+      });
+    }
+  };
+
+  // TODO: Xử lý API lấy danh sách dịch vụ
+  const fetchData = async () => {
+    try {
+      const response = await AxiosIntance().get("/service/list");
+      const apiData = response;
+      setData(apiData);
+    } catch (error) {
+      console.log();
+      Toast.show({
+        type: "error",
+        text1: "Không lấy được dữ liệu",
+      });
+    }
+  };
+  // TODO: Xử lý API gọi danh sách giỏ hàng
+  const fetchCartCount = async () => {
+    const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
+    const cartData = response;
+    const itemCount = Array.isArray(cartData.items) ? cartData.items.length : 0;
+    setCartCount(itemCount);
+  };
 
   //màn hình giỏ hàng
   const navigateToCart = () => {
     navigation.navigate("Cart");
   };
-
   //gọi goback và màn hình giỏ hàng
   const handleCartPress = () => {
     navigation.goBack();
     navigateToCart();
   };
-
   //thêm dịch vụ vào giỏ hàng
   const handleAddToCart = () => {
     fetchCartCount();
@@ -64,45 +202,6 @@ const ManagerService = () => {
     fetchCartCount();
   }, []);
 
-  // gọi api danh sách dịch vụ
-  const fetchData = async () => {
-    try {
-      const response = await AxiosIntance().get("/service/list");
-      const apiData = response;
-      setData(apiData);
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Không lấy được dữ liệu",
-      });
-    }
-  };
-
-  // gọi api thêm dịch vụ
-  const addService = async () => {
-    try {
-      await AxiosIntance().post("/service/create/", addService);
-      Toast.show({
-        type: "success",
-        text1: "Thêm thành công.",
-      });
-      fetchData();
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Thêm thất bại.",
-      });
-    }
-  };
-
-  // gọi api giỏ hàng
-  const fetchCartCount = async () => {
-    const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
-    const cartData = response;
-    const itemCount = Array.isArray(cartData.items) ? cartData.items.length : 0;
-    setCartCount(itemCount);
-  };
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -110,11 +209,19 @@ const ManagerService = () => {
         numColumns={numColumns}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
-          <ItemListService
-            item={item}
-            onAddToCart={() => handleAddToCart()}
-            onRemoveFromCart={() => handleRemoveFromCart()}
-          />
+          <TouchableNativeFeedback
+            onPress={() => {
+              console.log("Item Pressed");
+              setDataEdit({ ...item }), 
+              toggleModalUpdate();
+            }}
+          >
+            <ItemListService
+              item={item}
+              onAddToCart={() => handleAddToCart()}
+              onRemoveFromCart={() => handleRemoveFromCart()}
+            />
+          </TouchableNativeFeedback>
         )}
       />
       <TouchableOpacity
@@ -137,11 +244,46 @@ const ManagerService = () => {
       <TouchableOpacity style={styles.floatingAdd} onPress={toggleModalAdd}>
         <MaterialIcons name="add" size={30} color="white" />
       </TouchableOpacity>
-      <Modal visible={isModalAdd} style={styleModal.modalContainer}>
+
+      {/* Modal thêm dịch vụ */}
+      <Modal isVisible={isModalAdd} style={styleModal.modalContainer}>
         <View style={styleModal.modalContent}>
-          <View style={styleModal.frameTitleModal}>
-            <Text style={styleModal.titleModal}>Thêm dịch vụ</Text>
+          <View style={styles.frameImage}>
+            <TouchableNativeFeedback onPress={() => openImageLibrary()}>
+              {imageUri ? (
+                <Image style={styles.imgAdd} source={{ uri: imageUri }} />
+              ) : (
+                <Image
+                  style={styles.imgAddNull}
+                  source={require("../img/frame-add.png")}
+                />
+              )}
+            </TouchableNativeFeedback>
           </View>
+
+          <TextInput
+            style={styleModal.textInput}
+            onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
+            mode="outlined"
+            label="Tên dịch vụ"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
+            onChangeText={(text) => setDataAdd({ ...dataAdd, price: text })}
+            mode="outlined"
+            label="Giá tiền"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
+            onChangeText={(text) =>
+              setDataAdd({ ...dataAdd, description: text })
+            }
+            mode="outlined"
+            label="Mô tả"
+          />
+
           <View style={styleModal.buttonModal}>
             <TouchableOpacity
               onPress={toggleModalAdd}
@@ -149,10 +291,61 @@ const ManagerService = () => {
             >
               <Text style={styleModal.textButton1}>Hủy</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={addService} style={styleModal.button2}>
+              <Text style={styleModal.textButton2}>Thêm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal cập nhật dịch vụ */}
+      <Modal isVisible={isModalUpdate} style={styleModal.modalContainer}>
+        <View style={styleModal.modalContent}>
+          <View style={styles.frameImage}>
+            <TouchableNativeFeedback onPress={() => openImageLibrary()}>
+              {imageUri ? (
+                <Image style={styles.imgAdd} source={{ uri: dataEdit.image }} />
+              ) : (
+                <Image
+                  style={styles.imgAddNull}
+                  source={require("../img/frame-add.png")}
+                />
+              )}
+            </TouchableNativeFeedback>
+          </View>
+
+          <TextInput
+            style={styleModal.textInput}
+            value={dataEdit.name}
+            onChangeText={(text) => setDataEdit({ ...dataEdit, name: text })}
+            mode="outlined"
+            label="Tên dịch vụ"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
+            onChangeText={(text) => setDataEdit({ ...dataEdit, price: text })}
+            mode="outlined"
+            label="Giá tiền"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
+            onChangeText={(text) =>
+              setDataEdit({ ...dataEdit, description: text })
+            }
+            mode="outlined"
+            label="Mô tả"
+          />
+
+          <View style={styleModal.buttonModal}>
             <TouchableOpacity
-              // onPress={handleUpdateItem}
-              style={styleModal.button2}
+              onPress={toggleModalAdd}
+              style={styleModal.button1}
             >
+              <Text style={styleModal.textButton1}>Hủy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={addService} style={styleModal.button2}>
               <Text style={styleModal.textButton2}>Thêm</Text>
             </TouchableOpacity>
           </View>
@@ -197,5 +390,32 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     backgroundColor: "#0E55A7",
+  },
+  imgAddNull: {
+    width: 80,
+    height: 80,
+  },
+  imgAdd: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+  },
+  frameImage: {
+    width: 200,
+    height: 200,
+    marginTop: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f7fbff",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    elevation: 5,
   },
 });

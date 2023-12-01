@@ -8,7 +8,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
-import {Modal} from "react-native-paper";
+import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { AppConText } from "../util/AppContext";
@@ -169,7 +169,7 @@ const ManagerClient = () => {
       </TouchableOpacity>
 
       {/* Modal thêm thông tin khách hàng mới */}
-      <Modal visible={isAddModalVisible}  style={styleModal.modalContainer}>
+      <Modal isVisible={isAddModalVisible}  style={styleModal.modalContainer}>
         <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
@@ -178,19 +178,19 @@ const ManagerClient = () => {
 
             {/* Tạo các TextInput để thêm mới*/}
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               onChangeText={(text) => setaddData({ ...addData, name: text })}
               mode="outlined"
               label="Họ và tên"
             />
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               onChangeText={(text) => setaddData({ ...addData, address: text })}
               mode="outlined"
               label="Địa chỉ"
             />
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               onChangeText={(text) => setaddData({ ...addData, phone: text })}
               mode="outlined"
               label="Số điện thoại"
@@ -215,7 +215,7 @@ const ManagerClient = () => {
       </Modal>
 
       {/* Modal chỉnh sửa thông tin */}
-      <Modal visible={isUpdateModalVisible}  style={styleModal.modalContainer}>
+      <Modal isVisible={isUpdateModalVisible}  style={styleModal.modalContainer}>
         <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
@@ -223,7 +223,7 @@ const ManagerClient = () => {
             </View>
             {/* Tạo các TextInput để chỉnh sửa thông tin ở đây */}
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               value={editedData.name}
               onChangeText={(text) =>
                 setEditedData({ ...editedData, name: text })
@@ -232,7 +232,7 @@ const ManagerClient = () => {
               label="Họ và tên"
             />
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               value={editedData.address}
               onChangeText={(text) =>
                 setEditedData({ ...editedData, address: text })
@@ -241,7 +241,7 @@ const ManagerClient = () => {
               label="Địa chỉ"
             />
             <TextInput
-              style={styles.textInput}
+              style={styleModal.textInput}
               value={editedData.phone}
               onChangeText={(text) =>
                 setEditedData({ ...editedData, phone: text })
@@ -289,11 +289,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
     width: "100%",
-  },
-  textInput: {
-    marginTop: 10,
-    width: "90%",
-    backgroundColor: '#f7fbff'
   },
   fab: {
     position: "absolute",

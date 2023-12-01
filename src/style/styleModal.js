@@ -5,7 +5,6 @@ export const styleModal = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 10
   },
   modalContent: {
     backgroundColor: "white",
@@ -49,9 +48,14 @@ export const styleModal = StyleSheet.create({
     backgroundColor: "#0E55A7",
     padding: 12,
     marginTop: 10,
-    width: '90%',
+    width: 330,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
+  },
+  textInput: {
+    marginTop: 10,
+    width: 330,
+    backgroundColor: '#f7fbff'
   },
 });
