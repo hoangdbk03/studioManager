@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   Image,
   RefreshControl,
   ScrollView,
@@ -7,6 +8,7 @@ import {
   TouchableNativeFeedback,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import React, {
   useCallback,
@@ -29,11 +31,25 @@ import FloatingButton from "../items/FloatingButton";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import { List } from "react-native-paper";
+import AxiosIntance from "../util/AxiosIntance";
 
 const Home = () => {
   const navigation = useNavigation();
   const { inforUser } = useContext(AppConText);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [dataUser, setDataUser] = useState([]);
+
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await AxiosIntance().get(
+  //       `/user/detail/${inforUser._id}`
+  //     );
+  //     const apiData = response;
+  //     setDataUser(apiData);
+  //   } catch (error) {
+  //     console.log("sai", error);
+  //   }
+  // };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -112,7 +128,7 @@ const Home = () => {
       {/* phần thân */}
       <View style={styles.body}>
         <TabTop.Navigator
-          style={{ marginTop: 30 }}
+          style={{flex: 1, marginTop: 30 }}
           initialRouteName="Client"
           screenOptions={{
             tabBarInactiveTintColor: "black",
@@ -166,7 +182,10 @@ const Home = () => {
             borderRadius: 20,
           }}
         ></View>
-        <TouchableOpacity onPress={() => navigation.navigate('ManagerService')} style={styles.itemMid}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ManagerService")}
+          style={styles.itemMid}
+        >
           <Image
             style={styles.iconMid}
             source={require("../icons/camera.png")}
@@ -272,7 +291,7 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     width: "100%",
-    height: 500,
+    height: 600,
     backgroundColor: "white",
     position: "absolute",
     marginTop: 245,

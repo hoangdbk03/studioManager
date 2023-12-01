@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
 import { styleModal } from "../style/styleModal";
+import { useEffect } from "react";
 
 const Profile = () => {
   const navigation = useNavigation();
@@ -27,6 +28,7 @@ const Profile = () => {
 
   //lấy dữ liệu được lưu từ AppConText
   const { inforUser } = useContext(AppConText);
+  const [data, setData] = useState([]);
   const { setisLogin } = useContext(AppConText);
 
   const [idsession, setidsession] = useState(inforUser.session_id);
@@ -94,6 +96,7 @@ const Profile = () => {
     }
   };
 
+  // xử lý logout
   const handleStayLoggedInChoice = (stayLoggedIn) => {
     setStayLoggedInModalVisible(false);
     if (!stayLoggedIn) {
@@ -102,6 +105,17 @@ const Profile = () => {
     }
   };
 
+  // gọi api chi tiết người dùng
+  const fetchData = async () => {
+    const response = await AxiosIntance().get(`/user/detail/${inforUser._id}`);
+    const apiData = response;
+    setData(apiData);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.role}>Tài khoản: {inforUser.role}</Text>
@@ -109,10 +123,17 @@ const Profile = () => {
         {/* phần thông tin người dùng */}
         <View style={styles.profile}>
           <View style={styles.frameAvt}>
-            <Image
-              source={{ uri: inforUser.avatar }}
-              style={{ height: 60, width: 60, borderRadius: 100 }}
-            />
+            {data.avatar ? (
+              <Image
+                source={{ uri: data.avatar }}
+                style={{ height: 60, width: 60, borderRadius: 100 }}
+              />
+            ) : (
+              <Image
+                source={require('../icons/user.png')}
+                style={{ height: 60, width: 60, borderRadius: 100 }}
+              />
+            )}
           </View>
           <View style={styles.infor}>
             <Text style={styles.textName}>{inforUser.name}</Text>
@@ -222,7 +243,7 @@ const Profile = () => {
               <Text>Không</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={logout} style={styleModal.button2}>
-              <Text style={{color: '#0E55A7'}}>Đồng ý</Text>
+              <Text style={{ color: "#0E55A7" }}>Đồng ý</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -280,7 +301,7 @@ const Profile = () => {
               onPress={() => handleStayLoggedInChoice(true)}
               style={styleModal.button1}
             >
-              <Text style={{color: '#0E55A7'}}>Có</Text>
+              <Text style={{ color: "#0E55A7" }}>Có</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleStayLoggedInChoice(false)}
@@ -326,7 +347,7 @@ const styles = StyleSheet.create({
     marginStart: 20,
     fontSize: 20,
     fontWeight: "bold",
-    color: '#313e4d'
+    color: "#313e4d",
   },
   profile: {
     marginTop: 10,
@@ -408,10 +429,10 @@ const styles = StyleSheet.create({
   textInput: {
     width: "90%",
     marginTop: 10,
-    backgroundColor: '#f7fbff',
+    backgroundColor: "#f7fbff",
   },
-  titleButton: { 
-    fontSize: 16, 
-    color: "#313e4d" 
+  titleButton: {
+    fontSize: 16,
+    color: "#313e4d",
   },
 });

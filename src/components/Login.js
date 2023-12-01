@@ -17,6 +17,7 @@ import { Checkbox } from "react-native-paper";
 import AxiosIntance from "../util/AxiosIntance";
 import { AppConText } from "../util/AppContext";
 import Toast from "react-native-toast-message";
+import { useNavigation } from "@react-navigation/native";
 
 const Login = () => {
   
@@ -25,6 +26,7 @@ const Login = () => {
   const [emailUser, setemailUser] = useState("");
   const [passwordUser, setpasswordUser] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const goLogin = async () => {
     if (!emailUser || !passwordUser) {

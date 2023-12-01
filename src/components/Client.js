@@ -26,7 +26,7 @@ const Client = () => {
   const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
   const formattedDateTime = dateTime ? format(dateTime, "dd/MM/yyyy HH:mm:ss") : null;
 
-  //gọi api
+  //gọi api danh sách khách hàng
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get("/client/list/");

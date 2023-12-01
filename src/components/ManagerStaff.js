@@ -51,6 +51,7 @@ const ManagerStaff = ({ route, navigation }) => {
     }
   };
 
+  // alert xác nhận xóa
   const alertConfirm = (itemId)=>{
     Alert.alert(
       "Xác nhận xóa",
@@ -70,6 +71,7 @@ const ManagerStaff = ({ route, navigation }) => {
     )
   }
 
+  // gọi api xử lý xóa theo id
   const handleDelete = async(itemId) => {
     try {
       await AxiosIntance().delete("/user/delete/"+itemId);

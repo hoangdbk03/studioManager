@@ -8,7 +8,7 @@ import {
 import React, { useContext, useEffect, useState } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
-import Modal from "react-native-modal";
+import {Modal} from "react-native-paper";
 import { TextInput } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { AppConText } from "../util/AppContext";
@@ -169,8 +169,8 @@ const ManagerClient = () => {
       </TouchableOpacity>
 
       {/* Modal thêm thông tin khách hàng mới */}
-      <Modal isVisible={isAddModalVisible}>
-        <View style={styleModal.modalContainer}>
+      <Modal visible={isAddModalVisible}  style={styleModal.modalContainer}>
+        <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
               <Text style={styleModal.titleModal}>Thêm khách hàng mới</Text>
@@ -215,8 +215,8 @@ const ManagerClient = () => {
       </Modal>
 
       {/* Modal chỉnh sửa thông tin */}
-      <Modal isVisible={isUpdateModalVisible}>
-        <View style={styleModal.modalContainer}>
+      <Modal visible={isUpdateModalVisible}  style={styleModal.modalContainer}>
+        <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
               <Text style={styleModal.titleModal}>Cập nhật khách hàng</Text>
@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     flex: 1,
+    padding: 10
   },
   modalContainer: {
     flex: 1,

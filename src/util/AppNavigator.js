@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SplashScreen from "../components/SplashScreen";
@@ -10,7 +10,8 @@ import Cart from "../components/Cart";
 import Profile from "../components/Profile";
 import { AppConText } from "./AppContext";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import Foundation from "react-native-vector-icons/Foundation";
+import Octicons from "react-native-vector-icons/Octicons";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
 import ManagerClient from "../components/ManagerClient";
 import Register from "../components/Register";
@@ -20,6 +21,8 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import FloatingButton from "../items/FloatingButton";
 import DetailStaff from "../components/DetailStaff";
 import ManagerService from "../components/ManagerService";
+import { useEffect } from "react";
+import AxiosIntance from "./AxiosIntance";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -38,6 +41,24 @@ const Users = () => {
 //trang chủ, lịch, lịch sử, profile (Tab)
 const Tab = createBottomTabNavigator();
 const Main = () => {
+  const [cartCount, setCartCount] = useState(0);
+  const {inforUser} = useContext(AppConText);
+
+  const fetchCartCount = async () => {
+    try {
+      const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
+    const cartData = response;
+    const itemCount = Array.isArray(cartData.items) ? cartData.items.length : 0;
+    setCartCount(itemCount);
+    } catch (error) {
+     
+    }
+  };
+
+  useEffect(()=>{
+    fetchCartCount();
+  },[]);
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -63,7 +84,7 @@ const Main = () => {
             if (route.name == "Home") {
               iconName = focused ? "home" : "home";
             }
-            return <FontAwesome5 name={iconName} size={size} color={color} />;
+            return <Octicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}
@@ -76,9 +97,9 @@ const Main = () => {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
             if (route.name == "Job") {
-              iconName = focused ? "clipboard-pencil" : "clipboard-pencil";
+              iconName = focused ? "profile" : "profile";
             }
-            return <Foundation name={iconName} size={size} color={color} />;
+            return <AntDesign name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
         })}
@@ -96,6 +117,8 @@ const Main = () => {
             return <Feather name={iconName} size={23} color={color} />;
           },
           tabBarActiveTintColor: "#0E55A7",
+          tabBarBadge: cartCount,
+          tabBarBadgeStyle: {fontSize: 8}
         })}
       ></Tab.Screen>
       <Tab.Screen
@@ -157,7 +180,7 @@ const PageHome = () => {
             headerTitle: "Dịch vụ",
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
-            presentation: 'modal'
+            presentation: 'modal',
           }}
         />
         <Stack.Screen

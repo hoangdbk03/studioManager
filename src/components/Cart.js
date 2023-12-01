@@ -10,6 +10,7 @@ const Cart = () => {
   const [data, setData] = useState([]);
   const {inforUser} = useContext(AppConText);
 
+  // gọi api danh sách giỏ hàng
   const fetchData = async()=>{
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);

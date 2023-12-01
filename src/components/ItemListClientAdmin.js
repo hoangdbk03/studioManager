@@ -43,8 +43,8 @@ const ItemListClientAdmin = (props) => {
       <Modal isVisible={isDeleteModalVisible} style={styleModal.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.textModal}>
-            <Text>Bạn chắc chắn muốn xóa khách hàng</Text>
-            <Text style={{color: '#0E55A7', fontWeight: 'bold'}}>{item.name}</Text>
+            <Text style={{color: '#fc6261', fontWeight: 'bold'}}>Bạn chắc chắn muốn xóa khách hàng</Text>
+            <Text>{item.name}</Text>
           </View>
           <View style={styleModal.buttonModal}>
             <TouchableOpacity
@@ -68,12 +68,13 @@ export default ItemListClientAdmin;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#e7eef6",
     padding: 20,
-    borderTopWidth: 0.8,
+    marginTop: 10,
     borderColor: "#cfcfcf",
     justifyContent: "space-between",
     alignItems: "center",
+    borderRadius: 10
   },
   infor: {
     flexDirection: "row",
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
   },
   textModal: {
     padding: 10,
+    alignItems: 'center'
   },
   modalContent:{
     backgroundColor: "white",

@@ -5,11 +5,12 @@ export const styleModal = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    padding: 10
   },
   modalContent: {
     backgroundColor: "white",
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 10,
     width: '100%'
   },
   buttonModal: {
@@ -51,6 +52,6 @@ export const styleModal = StyleSheet.create({
     width: '90%',
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 5,
+    borderRadius: 10,
   },
 });
