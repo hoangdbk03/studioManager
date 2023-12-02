@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useContext, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -12,6 +12,7 @@ import { AppConText } from "./AppContext";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Octicons from "react-native-vector-icons/Octicons";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
 import ManagerClient from "../components/ManagerClient";
 import Register from "../components/Register";
@@ -23,6 +24,8 @@ import DetailStaff from "../components/DetailStaff";
 import ManagerService from "../components/ManagerService";
 import { useEffect } from "react";
 import AxiosIntance from "./AxiosIntance";
+import Client from "../components/Client";
+import { useNavigation } from "@react-navigation/native";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -42,22 +45,22 @@ const Users = () => {
 const Tab = createBottomTabNavigator();
 const Main = () => {
   const [cartCount, setCartCount] = useState(0);
-  const {inforUser} = useContext(AppConText);
+  const { inforUser } = useContext(AppConText);
 
   const fetchCartCount = async () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
-    const cartData = response;
-    const itemCount = Array.isArray(cartData.items) ? cartData.items.length : 0;
-    setCartCount(itemCount);
-    } catch (error) {
-     
-    }
+      const cartData = response;
+      const itemCount = Array.isArray(cartData.items)
+        ? cartData.items.length
+        : 0;
+      setCartCount(itemCount);
+    } catch (error) {}
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchCartCount();
-  },[]);
+  }, []);
 
   return (
     <Tab.Navigator
@@ -72,6 +75,7 @@ const Main = () => {
           bottom: 10,
           fontSize: 12,
         },
+        tabBarHideOnKeyboard: true,
       })}
     >
       <Tab.Screen
@@ -104,23 +108,45 @@ const Main = () => {
           tabBarActiveTintColor: "#0E55A7",
         })}
       ></Tab.Screen>
-      <Tab.Screen
-        name="Cart"
-        component={Cart}
-        options={({ route }) => ({
-          title: "Giỏ hàng",
-          tabBarIcon: ({ focused, color }) => {
-            let iconName;
-            if (route.name == "Cart") {
-              iconName = focused ? "shopping-cart" : "shopping-cart";
-            }
-            return <Feather name={iconName} size={23} color={color} />;
-          },
-          tabBarActiveTintColor: "#0E55A7",
-          tabBarBadge: cartCount,
-          tabBarBadgeStyle: {fontSize: 8}
-        })}
-      ></Tab.Screen>
+      {inforUser.role !== "Nhân viên" ? (
+        <Tab.Screen
+          name="Cart"
+          component={Cart}
+          options={({ route }) => ({
+            title: "Giỏ hàng",
+            tabBarIcon: ({ focused, color }) => {
+              let iconName;
+              if (route.name == "Cart") {
+                iconName = focused ? "shopping-cart" : "shopping-cart";
+              }
+              return <Feather name={iconName} size={23} color={color} />;
+            },
+            tabBarActiveTintColor: "#0E55A7",
+            tabBarBadge: cartCount,
+            tabBarBadgeStyle: { fontSize: 8 },
+          })}
+        ></Tab.Screen>
+      ) : (
+        <Tab.Screen
+          name="Client"
+          component={Client}
+          options={({ route }) => ({
+            title: "Khách hàng",
+            tabBarIcon: ({ focused, color }) => {
+              let iconImage = focused
+                ? require("../icons/client.png")
+                : require("../icons/client.png");
+              return (
+                <Image
+                  source={iconImage}
+                  style={{ width: 28, height: 28, tintColor: color }}
+                />
+              );
+            },
+            tabBarActiveTintColor: "#0E55A7",
+          })}
+        ></Tab.Screen>
+      )}
       <Tab.Screen
         name="PageProfile"
         component={PageProfile}
@@ -158,7 +184,7 @@ const PageHome = () => {
           options={{
             headerTitle: "Quản lý nhân viên",
             headerBackTitle: "Quay lại",
-            presentation: 'modal'
+            presentation: "modal",
           }}
         />
         <Stack.Screen
@@ -166,11 +192,11 @@ const PageHome = () => {
           component={DetailStaff}
           options={{
             headerTitle: "Thông tin nhân viên",
-            headerStyle: { backgroundColor: "#062446", elevation: 0},
+            headerStyle: { backgroundColor: "#062446", elevation: 0 },
             headerTitleAlign: "center",
             headerTintColor: "white",
             headerBackTitle: "Quay lại",
-            presentation: 'transparentModal',
+            presentation: "transparentModal",
           }}
         />
         <Stack.Screen
@@ -180,7 +206,14 @@ const PageHome = () => {
             headerTitle: "Dịch vụ",
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
-            presentation: 'modal',
+            presentation: "modal",
+            // headerRight: () => (
+            //   <TouchableOpacity
+            //     style={{ marginRight: 20 }}
+            //   >
+            //     <MaterialIcons name="add" size={28} color="black" />
+            //   </TouchableOpacity>
+            // ),
           }}
         />
         <Stack.Screen
@@ -190,7 +223,7 @@ const PageHome = () => {
             headerTitle: "Quản lý khách hàng",
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
-            presentation: 'modal'
+            presentation: "modal",
           }}
         />
         <Stack.Screen
@@ -200,7 +233,7 @@ const PageHome = () => {
             headerTitle: "Quản lý hóa đơn",
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
-            presentation: 'modal'
+            presentation: "modal",
           }}
         />
         <Stack.Screen
@@ -210,7 +243,7 @@ const PageHome = () => {
             headerTitle: "Đăng ký người dùng",
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
-            presentation: 'modal'
+            presentation: "modal",
           }}
         />
       </Stack.Navigator>

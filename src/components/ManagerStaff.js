@@ -108,7 +108,7 @@ const ManagerStaff = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Searchbar
-        placeholder="Search"
+        placeholder="Tìm kiếm"
         onChangeText={onChangeSearch}
         value={searchQuery}
         style={styles.searchBar}

@@ -26,11 +26,12 @@ export default ItemListClient;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    backgroundColor: "white",
+    backgroundColor: "#f7fbff",
     padding: 20,
-    borderTopWidth: 1,
     borderColor: "#cfcfcf",
     justifyContent: "space-between",
+    marginTop: 10,
+    borderRadius: 10,
   },
   container1: {
     flexDirection: "row",

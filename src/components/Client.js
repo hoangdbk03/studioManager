@@ -2,6 +2,7 @@ import {
   Dimensions,
   FlatList,
   Modal,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,16 +16,31 @@ import ItemListClient from "./ItemListClient";
 import Modal1 from "react-native-modal";
 import Toast from "react-native-toast-message";
 import { format, parseISO } from "date-fns";
+import { Searchbar } from "react-native-paper";
+import unorm from "unorm";
 
 const Client = () => {
+  // * nơi lưu danh sách khách hàng
   const [data, setdata] = useState([]);
+  // * xử lý hiển thị modal
   const [isModalVisible, setModalVisible] = useState(false);
+  // * nơi lưu thông tin của item khách hàng
   const [selectedData, setselectedData] = useState(null);
+  // * xử lý load trang
   const [refreshing, setRefreshing] = useState(false);
+  // * xử lý skeleton
+  const [loading, setLoading] = useState(true);
+  // * xử lý tìm kiếm
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+
+  // TODO: 
   const dateTimeString = selectedData ? selectedData.createdAt : null;
 
   const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
-  const formattedDateTime = dateTime ? format(dateTime, "dd/MM/yyyy HH:mm:ss") : null;
+  const formattedDateTime = dateTime
+    ? format(dateTime, "dd/MM/yyyy HH:mm:ss")
+    : null;
 
   //gọi api danh sách khách hàng
   const fetchData = async () => {
@@ -60,12 +76,35 @@ const Client = () => {
     setModalVisible(true);
   };
 
+  const onChangeSearch = (query) => setSearchQuery(query);
+
+  // Chuẩn hóa chuỗi sang Unicode NFD
+  const normalizedSearchQuery = unorm.nfkd(searchQuery.toLowerCase());
+
+  // Lọc dữ liệu dựa trên chuỗi tìm kiếm đã được chuẩn hóa
+  const filteredData = data.filter((item) => {
+    const normalizedDataName = unorm.nfkd(item.name.toLowerCase());
+    const normalizedDataPhone = unorm.nfkd(item.phone.toLowerCase());
+
+    return (
+      normalizedDataName.includes(normalizedSearchQuery) ||
+      normalizedDataPhone.includes(normalizedSearchQuery)
+    );
+  });
+
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <View style={styles.container}>
+      <Searchbar
+        placeholder="Tìm kiếm"
+        onChangeText={onChangeSearch}
+        value={searchQuery}
+        style={styles.searchBar}
+      />
       <FlatList
+        style={{ marginBottom: "21%" }}
         refreshing={refreshing}
         onRefresh={handleRefreshData}
-        data={data}
+        data={filteredData}
         keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => (
           <TouchableOpacity onPress={() => openModal(item._id)}>
@@ -139,9 +178,7 @@ const Client = () => {
                 }}
               >
                 <Text style={styles.textModalStyle}>Thời gian tạo: </Text>
-                <Text style={styles.textModalStyle}>
-                  {formattedDateTime}
-                </Text>
+                <Text style={styles.textModalStyle}>{formattedDateTime}</Text>
               </View>
             </>
           ) : null}
@@ -160,6 +197,11 @@ const Client = () => {
 export default Client;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+    padding: 10,
+  },
   titleModal: {
     backgroundColor: "#0E55A7",
     width: "100%",
@@ -183,5 +225,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderColor: "#dbdbdb",
     marginTop: 20,
+  },
+  searchBar: {
+    borderRadius: 10,
   },
 });

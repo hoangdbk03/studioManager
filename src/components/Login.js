@@ -23,8 +23,8 @@ const Login = () => {
   
   const { setisLogin, setinforUser } = useContext(AppConText);
 
-  const [emailUser, setemailUser] = useState("");
-  const [passwordUser, setpasswordUser] = useState("");
+  const [emailUser, setemailUser] = useState("hoangdbk03@gmail.com");
+  const [passwordUser, setpasswordUser] = useState("123");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
@@ -105,9 +105,8 @@ const Login = () => {
                 style={styles.textInput}
                 placeholder="example@gmail.com"
                 onChangeText={setemailUser}
-              >
-                hoangdbk03@gmail.com
-              </TextInput>
+                value={emailUser}
+              />
             </View>
             <View style={styles.viewLabelEmail}>
               <Text Text style={styles.label}>
@@ -125,9 +124,8 @@ const Login = () => {
                 secureTextEntry={!isPasswordVisible}
                 placeholder="*************"
                 onChangeText={setpasswordUser}
-              >
-                123
-              </TextInput>
+                value={passwordUser}
+              />
               <TouchableOpacity
                 style={styles.passwordVisibilityIcon}
                 onPress={togglePasswordVisibility}

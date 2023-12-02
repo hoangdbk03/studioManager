@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const AxiosIntance = () => {
     const axiosIntance = axios.create({
-        baseURL: 'https://api-graduation-project.vercel.app/'
+        baseURL: 'https://api-graduation-project-production.up.railway.app/'
     });
     axiosIntance.interceptors.response.use(
         res => res.data,
