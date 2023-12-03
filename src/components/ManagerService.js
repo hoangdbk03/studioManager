@@ -1,4 +1,5 @@
 import {
+  Button,
   Image,
   Platform,
   StyleSheet,
@@ -32,11 +33,22 @@ const ManagerService = () => {
   const { inforUser } = useContext(AppConText);
   const [imageUri, setImageUri] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItemForModal, setSelectedItemForModal] = useState(null);
 
   // ! Modal
   const [isModalAdd, setModalAdd] = useState(false);
   const [isModalUpdate, setModalUpdate] = useState(false);
   const [isModalDel, setModalDel] = useState(false);
+  const [isModalDetail, setModalDetail] = useState(false);
+
+  // * định dạng lại tiền việt
+  const formatCurrency = (amount) => {
+    const formatter = new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+    return formatter.format(amount);
+  };
 
   // * lưu trữ dữ liệu thêm
   const [dataAdd, setDataAdd] = useState({
@@ -55,6 +67,11 @@ const ManagerService = () => {
     setModalAdd(!isModalAdd);
     if (!isModalAdd) {
       setImageUri(null);
+      setDataAdd({
+        name: "",
+        description: "",
+        price: "",
+      });
     }
   };
   // * hiển thị modal cập nhật dịch vụ
@@ -65,8 +82,14 @@ const ManagerService = () => {
     }
   };
   // * hiển thị modal xác nhận xóa
-  const toggleModalDel = () => {
+  const toggleModalDel = (item) => {
     setModalDel(!isModalDel);
+    setSelectedItem(item);
+  };
+  // * hiển thị modal chi tiết dịch vụ
+  const handleModalDetail = (item) => {
+    setSelectedItemForModal(item);
+    setModalDetail(true);
   };
 
   /**
@@ -179,9 +202,9 @@ const ManagerService = () => {
     }
   };
   // TODO: APi xóa dịch vụ theo id
-  const deleteService = async () => {
+  const deleteService = async (serviceId) => {
     try {
-      await AxiosIntance().delete(`/service/delete/`);
+      await AxiosIntance().delete(`/service/delete/${serviceId}`);
       Toast.show({
         type: "success",
         text1: "Xóa thành công dịch vụ",
@@ -197,6 +220,10 @@ const ManagerService = () => {
   const handleEditService = (item) => {
     setSelectedItem(item);
     toggleModalUpdate();
+  };
+  const handleDeleteService = () => {
+    deleteService(selectedItem._id);
+    toggleModalDel();
   };
 
   // TODO: Xử lý API lấy danh sách dịch vụ
@@ -245,9 +272,9 @@ const ManagerService = () => {
   useEffect(() => {
     if (selectedItem) {
       setDataEdit({
-        name: selectedItem.name,
-        description: selectedItem.description,
-        price: selectedItem.price.toString(),
+        name: selectedItem.name || "",
+        description: selectedItem.description || "",
+        price: selectedItem.price ? selectedItem.price.toString() : "",
       });
     }
   }, [selectedItem]);
@@ -269,14 +296,18 @@ const ManagerService = () => {
             onAddToCart={() => handleAddToCart()}
             onRemoveFromCart={() => handleRemoveFromCart()}
             onEdit={handleEditService}
-            // onDelete={handleDeleteService}
+            onDelete={(item) => {
+              toggleModalDel();
+              setSelectedItem(item);
+            }}
+            onModal={(item) => handleModalDetail(item)}
           />
         )}
       />
       {inforUser.role === "Nhân viên" ? null : (
         <TouchableOpacity
           style={styles.floatingCart}
-          activeOpacity={0.6}
+          activeOpacity={1}
           onPress={handleCartPress}
         >
           <Feather
@@ -293,7 +324,11 @@ const ManagerService = () => {
         </TouchableOpacity>
       )}
       {inforUser.role === "Nhân viên" ? null : (
-        <TouchableOpacity style={styles.floatingAdd} onPress={toggleModalAdd}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.floatingAdd}
+          onPress={toggleModalAdd}
+        >
           <MaterialIcons name="add" size={30} color="white" />
         </TouchableOpacity>
       )}
@@ -324,11 +359,12 @@ const ManagerService = () => {
           <TextInput
             style={styleModal.textInput}
             onChangeText={(text) => {
-              setDataAdd({ ...dataAdd, price: text });
+              setDataAdd({ ...dataAdd, price: text.replace(/[^0-9]/g, "") });
             }}
             mode="outlined"
             label="Giá tiền"
             keyboardType="numeric"
+            value={formatCurrency(dataAdd.price)}
           />
 
           <TextInput
@@ -337,9 +373,15 @@ const ManagerService = () => {
             mode="outlined"
             label="Số lượng ảnh"
           />
+          <TextInput
+            style={styleModal.textInput}
+            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
+            mode="outlined"
+            label="Thời lượng chụp"
+          />
 
           <TextInput
-            style={[styleModal.textInput, { height: 200 }]}
+            style={[styleModal.textInput, { height: 150 }]}
             onChangeText={(text) =>
               setDataAdd({ ...dataAdd, description: text })
             }
@@ -386,10 +428,25 @@ const ManagerService = () => {
 
           <TextInput
             style={styleModal.textInput}
-            value={dataEdit.price}
-            onChangeText={(text) => setDataEdit({ ...dataEdit, price: text })}
+            value={formatCurrency(dataEdit.price)}
+            onChangeText={(text) =>
+              setDataEdit({ ...dataEdit, price: text.replace(/[^0-9]/g, "") })
+            }
             mode="outlined"
             label="Giá tiền"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
+            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
+            mode="outlined"
+            label="Số lượng ảnh"
+          />
+          <TextInput
+            style={styleModal.textInput}
+            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
+            mode="outlined"
+            label="Thời lượng chụp"
           />
 
           <TextInput
@@ -400,6 +457,7 @@ const ManagerService = () => {
             }
             mode="outlined"
             label="Mô tả"
+            multiline={true}
           />
 
           <View style={styleModal.buttonModal}>
@@ -419,11 +477,75 @@ const ManagerService = () => {
         </View>
       </Modal>
 
+      {/* Modal chi tiết dịch vụ */}
+      <Modal isVisible={isModalDetail} style={styleModal.modalContainer}>
+        {selectedItemForModal && (
+          <View style={styleModal.modalContent}>
+            <View style={{width: "100%", alignItems: 'flex-end', right: 10}}>
+              <Feather name="x" size={40} />
+            </View>
+            <View style={styles.frameImage}>
+              <Image
+                style={styles.imgAdd}
+                source={{ uri: selectedItemForModal.image }}
+              />
+            </View>
+            <TextInput
+              style={styleModal.textInput}
+              value={selectedItemForModal.name}
+              editable={false} // Set editable to false
+              mode="outlined"
+              label="Tên dịch vụ"
+            />
+            <TextInput
+              style={styleModal.textInput}
+              value={formatCurrency(selectedItemForModal.price)}
+              editable={false} // Set editable to false
+              mode="outlined"
+              label="Giá tiền"
+            />
+            <TextInput
+              style={styleModal.textInput}
+              // value={selectedItemForModal.name}
+              editable={false} // Set editable to false
+              mode="outlined"
+              label="Số lượng ảnh"
+            />
+            <TextInput
+              style={styleModal.textInput}
+              // value={selectedItemForModal.name}
+              editable={false} // Set editable to false
+              mode="outlined"
+              label="Thời lượng chụp"
+            />
+            <TextInput
+              style={[styleModal.textInput, { height: 150, marginBottom: 10 }]}
+              value={selectedItemForModal.description}
+              editable={false} // Set editable to false
+              mode="outlined"
+              label="Mô tả"
+              multiline={true}
+            />
+          </View>
+        )}
+      </Modal>
+
       {/* Modal xóa */}
       <Modal isVisible={isModalDel} style={styleModal.modalContainer}>
         <View style={styleModal.modalContent}>
-          <View>
-            <Text>Bạn chắc chắn muốn xóa?</Text>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 10,
+            }}
+          >
+            <Text style={styles.textCofirm}>
+              Bạn chắc chắn muốn xóa dịch vụ?
+            </Text>
+            <Text style={{ fontSize: 15 }}>
+              {selectedItem ? selectedItem.name : ""}
+            </Text>
           </View>
           <View style={styleModal.buttonModal}>
             <TouchableOpacity
@@ -433,7 +555,7 @@ const ManagerService = () => {
               <Text style={styleModal.textButton1}>Hủy</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={deleteService}
+              onPress={handleDeleteService}
               style={styleModal.button2}
             >
               <Text style={styleModal.textButton2}>Đồng ý</Text>
@@ -454,7 +576,7 @@ const styles = StyleSheet.create({
   },
   floatingCart: {
     position: "absolute",
-    bottom: 20,
+    bottom: 120,
     right: 20,
     backgroundColor: "#0E55A7",
     padding: 10,
@@ -472,8 +594,8 @@ const styles = StyleSheet.create({
   },
   floatingAdd: {
     position: "absolute",
-    bottom: 20,
-    left: 20,
+    bottom: 200,
+    right: 20,
     alignItems: "center",
     borderRadius: 100,
     justifyContent: "center",
@@ -507,5 +629,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
 
     elevation: 5,
+  },
+  textCofirm: {
+    color: "#fc6261",
+    fontSize: 15,
+    fontWeight: "bold",
   },
 });

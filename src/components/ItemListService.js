@@ -10,11 +10,11 @@ import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import { AppConText } from "../util/AppContext";
 import Toast from "react-native-toast-message";
 import AxiosIntance from "../util/AxiosIntance";
-import Feather from "react-native-vector-icons/Feather";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const ItemListService = (props) => {
-  const { item, onAddToCart, onRemoveFromCart, onEdit, onDelete } = props;
+  const { item, onAddToCart, onRemoveFromCart, onEdit, onDelete, onModal } = props;
   const { inforUser } = useContext(AppConText);
   const [inCart, setInCart] = useState(false);
 
@@ -67,7 +67,7 @@ const ItemListService = (props) => {
   };
   const handleDeleteService = () => {
     if (onDelete) {
-      onDelete(item._id);
+      onDelete(item);
     }
   };
 
@@ -86,6 +86,27 @@ const ItemListService = (props) => {
       <View style={{ alignItems: "flex-end" }}>
         <Text style={styles.textPrice}>{formatPrice(item.price)}₫</Text>
       </View>
+
+      <View style={{height: 0.8, backgroundColor: '#b0b0b0', borderRadius: 20}}/>
+
+      {/* Xem chi tiết */}
+      <View>
+        <TouchableOpacity onPress={()=> onModal(item)}>
+          <View style={styles.detailUser}>
+            <Text style={{ color: "#90b1d7", marginStart: 5, fontSize: 13 }}>
+              Xem chi tiết...
+            </Text>
+            <MaterialIcons
+              name="navigate-next"
+              size={20}
+              color={"#90b1d7"}
+              style={{ marginEnd: 10 }}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Các nút thêm sửa xóa */}
       {inforUser.role === "Nhân viên" ? null : (
         <TouchableOpacity style={styles.buttonAdd} onPress={addToCart}>
           <Text style={styles.textButton}>
@@ -93,17 +114,22 @@ const ItemListService = (props) => {
           </Text>
         </TouchableOpacity>
       )}
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <TouchableOpacity style={styles.buttonEdit} onPress={handleEditService}>
-          <Text style={styles.textButton}>Sửa</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.buttonDel}
-          onPress={handleDeleteService}
-        >
-          <Text style={styles.textButtonDel}>Xóa</Text>
-        </TouchableOpacity>
-      </View>
+      {inforUser.role === "Nhân viên" ? null : (
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <TouchableOpacity
+            style={styles.buttonEdit}
+            onPress={handleEditService}
+          >
+            <Text style={styles.textButton}>Sửa</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.buttonDel}
+            onPress={handleDeleteService}
+          >
+            <Text style={styles.textButtonDel}>Xóa</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };
@@ -191,5 +217,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 10,
     width: 70,
+  },
+  detailUser: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginStart: 10,
+    alignItems: "center",
+    marginTop: 5,
   },
 });
