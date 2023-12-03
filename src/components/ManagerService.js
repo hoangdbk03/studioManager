@@ -91,6 +91,10 @@ const ManagerService = () => {
     setSelectedItemForModal(item);
     setModalDetail(true);
   };
+  // * đóng modal chi tiết dịch vụ
+  const handleCloseModalDetail = () => {
+    setModalDetail(false);
+  };
 
   /**
    * TODO: Xử lý API
@@ -450,7 +454,10 @@ const ManagerService = () => {
           />
 
           <TextInput
-            style={styleModal.textInput}
+            style={[
+              styleModal.textInput,
+              { height: 150, marginBottom: 10 },
+            ]}
             value={dataEdit.description}
             onChangeText={(text) =>
               setDataEdit({ ...dataEdit, description: text })
@@ -479,55 +486,64 @@ const ManagerService = () => {
 
       {/* Modal chi tiết dịch vụ */}
       <Modal isVisible={isModalDetail} style={styleModal.modalContainer}>
-        {selectedItemForModal && (
-          <View style={styleModal.modalContent}>
-            <View style={{width: "100%", alignItems: 'flex-end', right: 10}}>
-              <Feather name="x" size={40} />
-            </View>
-            <View style={styles.frameImage}>
-              <Image
-                style={styles.imgAdd}
-                source={{ uri: selectedItemForModal.image }}
+        <View style={styleModal.modalContent}>
+          <TouchableOpacity
+            onPress={handleCloseModalDetail}
+            activeOpacity={1}
+            style={{ width: "100%", alignItems: "flex-end", right: 10 }}
+          >
+            <Feather name="x" size={40} />
+          </TouchableOpacity>
+          {selectedItemForModal && (
+            <>
+              <View style={styles.frameImage}>
+                <Image
+                  style={styles.imgAdd}
+                  source={{ uri: selectedItemForModal.image }}
+                />
+              </View>
+              <TextInput
+                style={styleModal.textInput}
+                value={selectedItemForModal.name}
+                disabled={true}
+                mode="outlined"
+                label="Tên dịch vụ"
               />
-            </View>
-            <TextInput
-              style={styleModal.textInput}
-              value={selectedItemForModal.name}
-              editable={false} // Set editable to false
-              mode="outlined"
-              label="Tên dịch vụ"
-            />
-            <TextInput
-              style={styleModal.textInput}
-              value={formatCurrency(selectedItemForModal.price)}
-              editable={false} // Set editable to false
-              mode="outlined"
-              label="Giá tiền"
-            />
-            <TextInput
-              style={styleModal.textInput}
-              // value={selectedItemForModal.name}
-              editable={false} // Set editable to false
-              mode="outlined"
-              label="Số lượng ảnh"
-            />
-            <TextInput
-              style={styleModal.textInput}
-              // value={selectedItemForModal.name}
-              editable={false} // Set editable to false
-              mode="outlined"
-              label="Thời lượng chụp"
-            />
-            <TextInput
-              style={[styleModal.textInput, { height: 150, marginBottom: 10 }]}
-              value={selectedItemForModal.description}
-              editable={false} // Set editable to false
-              mode="outlined"
-              label="Mô tả"
-              multiline={true}
-            />
-          </View>
-        )}
+              <TextInput
+                style={styleModal.textInput}
+                value={formatCurrency(selectedItemForModal.price)}
+                disabled={true}
+                mode="outlined"
+                label="Giá tiền"
+              />
+              <TextInput
+                style={styleModal.textInput}
+                // value={selectedItemForModal.name}
+                disabled={true}
+                mode="outlined"
+                label="Số lượng ảnh"
+              />
+              <TextInput
+                style={styleModal.textInput}
+                // value={selectedItemForModal.name}
+                disabled={true}
+                mode="outlined"
+                label="Thời lượng chụp"
+              />
+              <TextInput
+                style={[
+                  styleModal.textInput,
+                  { height: 150, marginBottom: 10 },
+                ]}
+                value={selectedItemForModal.description}
+                disabled={true}
+                mode="outlined"
+                label="Mô tả"
+                multiline={true}
+              />
+            </>
+          )}
+        </View>
       </Modal>
 
       {/* Modal xóa */}

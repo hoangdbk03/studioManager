@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
@@ -118,120 +119,116 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.role}>Tài khoản: {inforUser.role}</Text>
-      <View style={styles.container1}>
-        {/* phần thông tin người dùng */}
-        <View style={styles.profile}>
-          <View style={styles.frameAvt}>
-            {data.avatar ? (
-              <Image
-                source={{ uri: data.avatar }}
-                style={{ height: 60, width: 60, borderRadius: 100 }}
-              />
-            ) : (
-              <Image
-                source={require('../icons/user.png')}
-                style={{ height: 60, width: 60, borderRadius: 100 }}
-              />
-            )}
-          </View>
-          <View style={styles.infor}>
-            <Text style={styles.textName}>{inforUser.name}</Text>
-            <Text style={styles.textEmail}>{inforUser.email}</Text>
-          </View>
-          <TouchableOpacity style={{ flex: 1, alignItems: "flex-end" }}>
-            <MaterialIcons
-              name="edit"
-              size={25}
-              color={"white"}
-              style={{ marginEnd: 20 }}
-            />
-          </TouchableOpacity>
+      <ImageBackground
+        source={require("../img/backgroundProfile.jpg")}
+        style={styles.background}
+      />
+      <TouchableOpacity
+        style={{ position: "absolute", right: 30, marginTop: 10 }}
+        // !
+      >
+        <MaterialIcons name="edit" size={25} color={"white"} />
+      </TouchableOpacity>
+      <View style={styles.profile}>
+        {/* thông tin tên email */}
+        <View style={styles.infor}>
+          <Text style={styles.textName}>{inforUser.name}</Text>
+          <Text style={styles.textEmail}>{inforUser.email}</Text>
         </View>
 
-        {/* phần các chức năng thông tin*/}
-        <View style={styles.body1}>
-          <TouchableOpacity
-            style={styles.frame1}
-            onPress={toggleModalChangePass}
-          >
-            <View style={styles.frameIcon}>
-              <Image
-                source={require("../icons/password.png")}
-                style={styles.icon}
-              />
-            </View>
-            <View style={{ marginStart: 10 }}>
-              <Text style={styles.titleButton}>Đổi mật khẩu</Text>
-            </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+        {/* các nút xử lý */}
+        <ScrollView>
+          <View>
+            <TouchableOpacity
+              style={[styles.frameContainer, { marginTop: 50 }]}
+              onPress={toggleModalChangePass}
+            >
+              <View style={styles.frameButton}>
+                <Image
+                  style={styles.icon}
+                  source={require("../icons/password.png")}
+                />
+                <Text style={styles.textButton}>Đổi mật khẩu</Text>
+              </View>
               <MaterialIcons
                 name="navigate-next"
                 size={20}
                 color={"gray"}
                 style={{ marginEnd: 10 }}
               />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.frame1}>
-            <View style={styles.frameIcon}>
-              <Image
-                source={require("../icons/support.png")}
-                style={styles.icon}
-              />
-            </View>
-            <View style={{ marginStart: 10 }}>
-              <Text style={styles.titleButton}>Hỗ trợ</Text>
-            </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.frameContainer}>
+              <View style={styles.frameButton}>
+                <Image
+                  style={styles.icon}
+                  source={require("../icons/support.png")}
+                />
+                <Text style={styles.textButton}>Trợ giúp</Text>
+              </View>
               <MaterialIcons
                 name="navigate-next"
                 size={20}
                 color={"gray"}
                 style={{ marginEnd: 10 }}
               />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.frame1}>
-            <View style={styles.frameIcon}>
-              <Image
-                source={require("../icons/info.png")}
-                style={styles.icon}
-              />
-            </View>
-            <View style={{ marginStart: 10 }}>
-              <Text style={styles.titleButton}>Thông tin ứng dụng</Text>
-            </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.frameContainer}>
+              <View style={styles.frameButton}>
+                <Image
+                  style={styles.icon}
+                  source={require("../icons/info.png")}
+                />
+                <Text style={styles.textButton}>Thông tin ứng dụng</Text>
+              </View>
               <MaterialIcons
                 name="navigate-next"
                 size={20}
                 color={"gray"}
                 style={{ marginEnd: 10 }}
               />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={toggleModalLogout} style={styles.frame1}>
-            <View style={styles.frameIcon}>
-              <Image
-                source={require("../icons/logout.png")}
-                style={styles.icon}
-              />
-            </View>
-            <View style={{ marginStart: 10 }}>
-              <Text style={styles.titleButton}>Đăng xuất</Text>
-            </View>
-            <View style={{ flex: 1, alignItems: "flex-end" }}>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.frameContainer, {marginBottom: 10}]} onPress={toggleModalLogout}>
+              <View style={styles.frameButton}>
+                <Image
+                  style={styles.icon}
+                  source={require("../icons/logout.png")}
+                />
+                <Text style={styles.textButton}>Đăng xuất</Text>
+              </View>
               <MaterialIcons
                 name="navigate-next"
                 size={20}
                 color={"gray"}
                 style={{ marginEnd: 10 }}
               />
-            </View>
-          </TouchableOpacity>
-        </View>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </View>
+      <View style={styles.frameAvt}>
+        {data.avatar ? (
+          <Image
+            source={{ uri: data.avatar }}
+            style={{
+              height: 95,
+              width: 95,
+              borderRadius: 15,
+              backgroundColor: "black",
+            }}
+          />
+        ) : (
+          <Image
+            source={require("../icons/user.png")}
+            style={{
+              height: 95,
+              width: 95,
+              borderRadius: 15,
+              backgroundColor: "black",
+            }}
+          />
+        )}
+      </View>
+
       <Modal isVisible={islogoutVisible}>
         <View style={styles.containerModal}>
           <Text style={styles.textModal}>Bạn chắc chắn muốn đăng xuất?</Text>
@@ -270,12 +267,11 @@ const Profile = () => {
               }
               style={styles.textInput}
             />
-            {/* <TextInput
+            <TextInput
               mode="outlined"
               label="Nhập lại mật khẩu mới"
-              
               style={styles.textInput}
-            /> */}
+            />
             <View style={styleModal.buttonModal}>
               <TouchableOpacity
                 onPress={toggleModalChangePass}
@@ -321,86 +317,90 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 10,
+    backgroundColor: "#0E55A7",
+    marginBottom: "22%",
+  },
+  background: {
+    width: "100%",
+    height: 155,
   },
   container1: {
     flex: 1,
     alignItems: "center",
   },
-  body: {
-    width: "95%",
-    height: "30%",
-    marginTop: 25,
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  body1: {
-    width: "95%",
-    height: "45%",
-    marginTop: 25,
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  role: {
-    marginStart: 20,
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#313e4d",
-  },
   profile: {
-    marginTop: 10,
-    flexDirection: "row",
-    width: "95%",
-    height: "12%",
-    backgroundColor: "#0E55A7",
-    borderRadius: 10,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#f5f5f5",
+    borderRadius: 20,
     alignItems: "center",
+  },
+  infor: {
+    marginTop: 70,
+    alignItems: "center",
+  },
+  frameAvt: {
+    width: 110,
+    height: 110,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    marginTop: 100,
+    backgroundColor: "white",
+    alignSelf: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 2,
     },
-    shadowOpacity: 0.34,
-    shadowRadius: 6.27,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
 
-    elevation: 10,
+    elevation: 5,
   },
-  infor: {
-    marginStart: 10,
-  },
-  frameAvt: {
-    width: 62,
-    height: 62,
-    backgroundColor: "white",
-    borderRadius: 100,
-    justifyContent: "center",
+  frameContainer: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "white",
+    width: 350,
+    borderRadius: 10,
+    padding: 20,
+    marginTop: 25,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+  },
+  frameButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  textButton: {
+    fontSize: 16,
+    fontWeight: "bold",
     marginStart: 20,
   },
   textName: {
-    color: "white",
-    fontSize: 17,
+    color: "black",
+    fontSize: 25,
     fontWeight: "bold",
   },
   textEmail: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "300",
+    color: "#8a8a8a",
+    fontSize: 15,
+    fontWeight: "400",
     marginTop: 5,
   },
   frame: {
     width: "95%",
     height: "28%",
-    flexDirection: "row",
-    marginTop: 10,
-    marginStart: 20,
-    alignItems: "center",
-  },
-  frame1: {
-    width: "95%",
-    height: "18%",
     flexDirection: "row",
     marginTop: 10,
     marginStart: 20,
@@ -430,9 +430,5 @@ const styles = StyleSheet.create({
     width: "90%",
     marginTop: 10,
     backgroundColor: "#f7fbff",
-  },
-  titleButton: {
-    fontSize: 16,
-    color: "#313e4d",
   },
 });

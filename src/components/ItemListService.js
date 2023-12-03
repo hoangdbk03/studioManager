@@ -49,7 +49,6 @@ const ItemListService = (props) => {
           type: "success",
           text1: "Thêm thành công vào giỏ hàng",
         });
-        onAddToCart();
       }
       setInCart(!inCart);
     } catch (error) {
