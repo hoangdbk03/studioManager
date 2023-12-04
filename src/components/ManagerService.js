@@ -132,7 +132,7 @@ const ManagerService = () => {
       formData.append("description", dataAdd.description);
       formData.append("price", dataAdd.price);
 
-      // Check if an image is selected before appending to FormData
+      // Kiểm tra xem hình ảnh có được chọn hay không trước khi thêm vào FormData
       if (imageUri) {
         const imageUriParts = imageUri.split(".");
         const imageFileType = imageUriParts[imageUriParts.length - 1];
@@ -172,7 +172,7 @@ const ManagerService = () => {
       formData.append("description", dataEdit.description);
       formData.append("price", dataEdit.price);
 
-      // Check if an image is selected before appending to FormData
+      // Kiểm tra xem hình ảnh có được chọn hay không trước khi thêm vào FormData
       if (imageUri) {
         const imageUriParts = imageUri.split(".");
         const imageFileType = imageUriParts[imageUriParts.length - 1];

@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -38,12 +39,24 @@ const Cart = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={data}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <ItemListCart item={item} />}
-      />
-      <TouchableOpacity style={styles.fab} onPress={()=> navigation.navigate("ManagerService")}>
+      {data.length > 0 ? (
+        <FlatList
+          data={data}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <ItemListCart item={item} />}
+        />
+      ) : (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{width: 150, height: 150, backgroundColor: '#e7eef6', borderRadius: 300, justifyContent: 'center', alignItems: 'center'}}>
+            <Image style={{width: 60, height: 60, tintColor: '#b4cae4'}} source={require("../img/taskList.png")} />
+          </View>
+          <Text style={{color: '#545454', marginTop: 10}}>Chưa có đơn hàng nào</Text>
+        </View>
+      )}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate("ManagerService")}
+      >
         <Text style={styles.textfab}>Dịch vụ</Text>
         <Entypo name="camera" size={25} color={"white"} />
       </TouchableOpacity>
@@ -74,8 +87,8 @@ const styles = StyleSheet.create({
   },
   textfab: {
     color: "white",
-    fontWeight: '500',
+    fontWeight: "500",
     marginEnd: 10,
-    fontSize: 15
+    fontSize: 15,
   },
 });

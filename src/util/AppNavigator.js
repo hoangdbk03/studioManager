@@ -114,7 +114,7 @@ const Main = () => {
           name="Cart"
           component={Cart}
           options={({ route }) => ({
-            title: "Giỏ hàng",
+            title: "Đơn hàng",
             tabBarIcon: ({ focused, color }) => {
               let iconName;
               if (route.name == "Cart") {

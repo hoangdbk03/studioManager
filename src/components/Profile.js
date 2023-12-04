@@ -20,7 +20,7 @@ import { TextInput } from "react-native-paper";
 import { styleModal } from "../style/styleModal";
 import { useEffect } from "react";
 
-const Profile = () => {
+const Profile = ({route}) => {
   const navigation = useNavigation();
   const [islogoutVisible, setlogoutVisible] = useState(false);
   const [isChangePasswordVisible, setChangePasswordVisible] = useState(false);
@@ -121,8 +121,13 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (route.params?.refresh) {
+      fetchData();
+      navigation.setParams({refresh: false});
+    }else{
+      fetchData();
+    }
+  }, [route.params?.refresh]);
 
   return (
     <View style={styles.container}>
