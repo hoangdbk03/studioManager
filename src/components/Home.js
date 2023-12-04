@@ -1,5 +1,6 @@
 import {
   Dimensions,
+  FlatList,
   Image,
   RefreshControl,
   ScrollView,
@@ -32,36 +33,54 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import { List } from "react-native-paper";
 import AxiosIntance from "../util/AxiosIntance";
+import ItemListJob from "./ItemListJob";
 
 const Home = () => {
   const navigation = useNavigation();
   const { inforUser } = useContext(AppConText);
   const [isModalVisible, setModalVisible] = useState(false);
   const [dataUser, setDataUser] = useState([]);
+  const [dataListOrder, setDataListOrder] = useState([]);
 
+  // * hiển thị modal staff
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
+  // * chuyển đến trang ManagerStaff
   const handleNextStaff = () => {
     setModalVisible(false);
-
     navigation.navigate("ManagerStaff");
   };
+  // * chuyển đến trang Salary
   const handleNextSalary = () => {
     setModalVisible(false);
 
     //navigation.navigate("ManagerStaff");
   };
 
+  // TODO:  Xử lý api gọi danh sách đơn hàng
   useEffect(() => {
-    // Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt
+    const fetchDataOrder = async () => {
+      try {
+        const response = await AxiosIntance().get("/order/list");
+        const apiData = response;
+        setDataListOrder(apiData);
+      } catch (error) {
+        console.log("Gọi danh sách giỏ hàng", error);
+      }
+    };
+    fetchDataOrder();
+  }, []);
+
+  // TODO: Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt
+  useEffect(() => {
     if (Platform.OS === "android") {
       require("intl/locale-data/jsonp/vi");
     }
   }, []);
 
-  // Lấy ngày hiện tại
+  // * Lấy ngày hiện tại
   const today = new Date();
   const dayName = format(today, "EEEE", { locale: vi });
   const dayOfMonth = format(today, "d MMMM yyyy", { locale: vi });
@@ -95,6 +114,17 @@ const Home = () => {
             source={require("../img/logoHome.png")}
           />
         </View>
+      </View>
+
+      {/* Phần thân */}
+      <View style={styles.body}>
+        <Text style={styles.buttonOption}>Tất cả công việc</Text>
+        <FlatList
+          style={styles.body_list}
+          data={dataListOrder}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <ItemListJob item={item} />}
+        />
       </View>
 
       {/* khung button nhân viên và gói chụp */}
@@ -291,15 +321,37 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 11,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOpacity: 0.55,
+    shadowRadius: 14.78,
 
-    elevation: 1,
+    elevation: 22,
   },
   disabledItem: {
     opacity: 0.5,
     pointerEvents: "none",
+  },
+  body: {
+    height: "55%",
+    width: "100%",
+    position: "absolute",
+    marginTop: "61%",
+    backgroundColor: "white",
+    borderRadius: 20,
+  },
+  body_list: {
+    padding: 15,
+  },
+  buttonOption: {
+    marginTop: "12%",
+    backgroundColor: "#0E55A7",
+    width: 120,
+    padding: 8,
+    borderRadius: 40,
+    color: "white",
+    marginStart: 20,
+    fontWeight: "500",
+    marginBottom: 5
   },
 });

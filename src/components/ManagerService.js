@@ -248,27 +248,27 @@ const ManagerService = () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
       const cartData = response;
-      const itemCount = Array.isArray(cartData.items)
-        ? cartData.items.length
+      const itemCount = Array.isArray(cartData.services)
+        ? cartData.services.length
         : 0;
       setCartCount(itemCount);
     } catch (error) {}
   };
 
-  //màn hình giỏ hàng
+  // * màn hình giỏ hàng
   const navigateToCart = () => {
     navigation.navigate("Cart");
   };
-  //gọi goback và màn hình giỏ hàng
+  // * gọi goback và màn hình giỏ hàng
   const handleCartPress = () => {
     navigation.goBack();
     navigateToCart();
   };
-  //thêm dịch vụ vào giỏ hàng
+  // * thêm dịch vụ vào giỏ hàng
   const handleAddToCart = () => {
     fetchCartCount();
   };
-  //xóa dịch vụ khỏi giỏ hàng
+  // * xóa dịch vụ khỏi giỏ hàng
   const handleRemoveFromCart = () => {
     fetchCartCount();
   };
@@ -454,10 +454,7 @@ const ManagerService = () => {
           />
 
           <TextInput
-            style={[
-              styleModal.textInput,
-              { height: 150, marginBottom: 10 },
-            ]}
+            style={[styleModal.textInput, { height: 150, marginBottom: 10 }]}
             value={dataEdit.description}
             onChangeText={(text) =>
               setDataEdit({ ...dataEdit, description: text })

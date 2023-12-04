@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import { FAB, Portal, PaperProvider } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import { AppConText } from "../util/AppContext";
 
 const FloatingButton = () => {
+  const {inforUser} = useContext(AppConText);
   const navigation = useNavigation();
   const [state, setState] = React.useState({ open: false });
 
@@ -32,18 +34,7 @@ const FloatingButton = () => {
 
           labelStyle: {fontSize: 13}
         },
-        {
-          icon: require("../icons/bill.png"),
-          label: "Quản lý hóa đơn",
-          onPress: () => navigation.navigate('ManagerBill'),
-          labelTextColor: "white",
-          color: "white",
-          containerStyle: { backgroundColor: "#0E55A7" },
-          style: { backgroundColor: "#0E55A7" },
-
-          labelStyle: {fontSize: 13}
-        },
-        {
+        inforUser.role !== "Quản lý" &&{
           icon: require("../icons/add-user.png"),
           label: "Đăng ký người dùng",
           onPress: () => navigation.navigate('Register'),
@@ -54,7 +45,7 @@ const FloatingButton = () => {
 
           labelStyle: {fontSize: 13}
         },
-      ]}
+      ].filter(Boolean)}
       onStateChange={onStateChange}
       onPress={() => {
         if (open) {

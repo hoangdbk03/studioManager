@@ -13,7 +13,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import AxiosIntance from "../util/AxiosIntance";
 import Toast from "react-native-toast-message";
 
-
 const dataRole = [
   { label: "Quản lý", value: "1" },
   { label: "Nhân viên", value: "2" },
@@ -199,14 +198,11 @@ const Register = () => {
       {/* chọn ban nhân sự => quản lý or nhân viên */}
       <Dropdown
         style={[styles.dropdown, { borderColor: "#0E55A7" }]}
-        inputSearchStyle={styles.inputSearchStyle}
         data={dataRole}
-        search
         maxHeight={300}
         labelField="label"
         valueField="value"
         placeholder="Vị trí công việc"
-        searchPlaceholder="Search..."
         value={roleValue}
         onChange={(item) => {
           setroleValue(item.value);
@@ -230,7 +226,7 @@ const Register = () => {
           labelField="label"
           valueField="value"
           placeholder="Loại công việc"
-          searchPlaceholder="Search..."
+          searchPlaceholder="Tìm kiếm..."
           value={workValue}
           onChange={(item) => {
             setworkValue(item.value);

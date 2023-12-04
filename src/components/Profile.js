@@ -20,7 +20,7 @@ import { TextInput } from "react-native-paper";
 import { styleModal } from "../style/styleModal";
 import { useEffect } from "react";
 
-const Profile = ({route}) => {
+const Profile = ({ route }) => {
   const navigation = useNavigation();
   const [islogoutVisible, setlogoutVisible] = useState(false);
   const [isChangePasswordVisible, setChangePasswordVisible] = useState(false);
@@ -123,8 +123,8 @@ const Profile = ({route}) => {
   useEffect(() => {
     if (route.params?.refresh) {
       fetchData();
-      navigation.setParams({refresh: false});
-    }else{
+      navigation.setParams({ refresh: false });
+    } else {
       fetchData();
     }
   }, [route.params?.refresh]);
@@ -136,10 +136,12 @@ const Profile = ({route}) => {
         style={styles.background}
       />
       <TouchableOpacity
-        onPress={()=> navigation.navigate("DetailUser")}
+        onPress={() => navigation.navigate("DetailUser")}
         style={{ position: "absolute", right: 30, marginTop: 10 }}
       >
-        <MaterialIcons name="edit" size={25} color={"white"} />
+        {data.role === "Admin" ? null : (
+          <MaterialIcons name="edit" size={25} color={"white"} />
+        )}
       </TouchableOpacity>
       <View style={styles.profile}>
         {/* thông tin tên email */}
@@ -327,7 +329,6 @@ const Profile = ({route}) => {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 };

@@ -23,24 +23,28 @@ const Cart = () => {
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
-      const apiData = response.items;
-      setData(apiData);
+      const apiDataServices = response.services;
+      // const apiDataStaffs = response.staffs; // ! thay đổi thành services
+
+      setData(apiDataServices);
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Không lấy được dữ liệu",
-      });
+      
     }
   };
 
   useEffect(() => {
     fetchData();
+    // const interval = setInterval(()=>{
+    //   fetchData();
+    // }, 5000);
+    // return ()=> clearInterval(interval);
   }, []);
 
   return (
     <View style={styles.container}>
       {data.length > 0 ? (
         <FlatList
+        style={{marginBottom: "21%"}}
           data={data}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <ItemListCart item={item} />}

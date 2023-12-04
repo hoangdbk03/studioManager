@@ -56,7 +56,7 @@ const Client = () => {
   };
 
   useEffect(() => {
-    fetchData();
+      fetchData();
   }, []);
 
   //xử lý load lại data

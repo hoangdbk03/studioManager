@@ -12,11 +12,9 @@ import { AppConText } from "./AppContext";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import Octicons from "react-native-vector-icons/Octicons";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
 import ManagerClient from "../components/ManagerClient";
 import Register from "../components/Register";
-import ManagerBill from "../components/ManagerBill";
 import ManagerStaff from "../components/ManagerStaff";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import FloatingButton from "../items/FloatingButton";
@@ -28,7 +26,7 @@ import Client from "../components/Client";
 import { useNavigation } from "@react-navigation/native";
 import DetailUser from "../components/DetailUser";
 
-//splashScreen, login (Stack)
+// TODO: splashScreen, login (Stack)
 const Stack = createStackNavigator();
 const Users = () => {
   return (
@@ -42,7 +40,7 @@ const Users = () => {
   );
 };
 
-//trang chủ, lịch, lịch sử, profile (Tab)
+// TODO: trang chủ, lịch, lịch sử, profile (Tab)
 const Tab = createBottomTabNavigator();
 const Main = () => {
   const [cartCount, setCartCount] = useState(0);
@@ -52,15 +50,20 @@ const Main = () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
       const cartData = response;
-      const itemCount = Array.isArray(cartData.items)
-        ? cartData.items.length
+      const itemCount = Array.isArray(cartData.services)
+        ? cartData.services.length
         : 0;
       setCartCount(itemCount);
     } catch (error) {}
   };
 
+  // TODO: kiểm tra data
   useEffect(() => {
     fetchCartCount();
+    const interval = setInterval(()=>{
+      fetchCartCount();
+    }, 3000);
+    return ()=> clearInterval(interval);
   }, []);
 
   return (
@@ -94,6 +97,7 @@ const Main = () => {
           tabBarActiveTintColor: "#0E55A7",
         })}
       ></Tab.Screen>
+
       <Tab.Screen
         name="Job"
         component={Job}
@@ -109,6 +113,7 @@ const Main = () => {
           tabBarActiveTintColor: "#0E55A7",
         })}
       ></Tab.Screen>
+
       {inforUser.role !== "Nhân viên" ? (
         <Tab.Screen
           name="Cart"
@@ -168,7 +173,7 @@ const Main = () => {
   );
 };
 
-//home
+// TODO: trang home
 const PageHome = () => {
   return (
     <>
@@ -221,16 +226,6 @@ const PageHome = () => {
           }}
         />
         <Stack.Screen
-          name="ManagerBill"
-          component={ManagerBill}
-          options={{
-            headerTitle: "Quản lý hóa đơn",
-            headerBackTitle: "Quay lại",
-            headerTitleAlign: "center",
-            presentation: "modal",
-          }}
-        />
-        <Stack.Screen
           name="Register"
           component={Register}
           options={{
@@ -245,7 +240,7 @@ const PageHome = () => {
   );
 };
 
-//profile
+// TODO: Trang cá nhân
 const PageProfile = () => {
   return (
     <Stack.Navigator initialRouteName="Profile">
@@ -268,12 +263,12 @@ const PageProfile = () => {
   );
 };
 
+// * xử lý ẩn bottom bar khi sử dụng stack
 const hideTabBar = (route) => {
   const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
 
   const screensToHideTabBar = [
     "ManagerClient",
-    "ManagerBill",
     "Register",
     "ManagerStaff",
     "DetailStaff",
@@ -287,6 +282,7 @@ const hideTabBar = (route) => {
   return "flex";
 };
 
+// TODO: Main
 const AppNavigator = () => {
   const { isLogin } = useContext(AppConText);
   return <>{isLogin == false ? <Users /> : <Main />}</>;

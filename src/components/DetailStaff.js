@@ -138,7 +138,7 @@ const DetailStaff = ({ route }) => {
               onChangeText={(text) => setBirthday(text)}
             />
              <Dropdown
-              style={[styles.dropdown, { width: "35%", marginTop: 5 }]}
+              style={[styles.dropdown, { width: "30%", marginTop: 5 }]}
               data={roleOptions}
               value={role}
               maxHeight={300}
@@ -152,7 +152,7 @@ const DetailStaff = ({ route }) => {
               onChangeText={(value) => setRole(value)}
             />
             <Dropdown
-              style={[styles.dropdown, { width: "25%",  marginTop: 5  }]}
+              style={[styles.dropdown, { width: "30%",  marginTop: 5  }]}
               data={genderOptions}
               value={selectedGender}
               maxHeight={300}
