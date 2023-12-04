@@ -321,12 +321,12 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 11,
+      height: 1,
     },
-    shadowOpacity: 0.55,
-    shadowRadius: 14.78,
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
 
-    elevation: 22,
+    elevation: 2,
   },
   disabledItem: {
     opacity: 0.5,
@@ -352,6 +352,6 @@ const styles = StyleSheet.create({
     color: "white",
     marginStart: 20,
     fontWeight: "500",
-    marginBottom: 5
+    marginBottom: 5,
   },
 });

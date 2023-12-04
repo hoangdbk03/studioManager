@@ -53,7 +53,7 @@ export default ItemListJob;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 5
+    padding: 5,
   },
   container1: {
     backgroundColor: "white",
@@ -63,12 +63,12 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 5,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    shadowOpacity: 0.34,
+    shadowRadius: 6.27,
 
-    elevation: 2,
+    elevation: 5,
   },
   serviceImage: {
     width: 30,
