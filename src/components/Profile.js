@@ -27,10 +27,12 @@ const Profile = () => {
   const [isStayLoggedInModalVisible, setStayLoggedInModalVisible] =
     useState(false);
 
-  //lấy dữ liệu được lưu từ AppConText
+  // * lấy dữ liệu được lưu từ AppConText
   const { inforUser } = useContext(AppConText);
-  const [data, setData] = useState([]);
   const { setisLogin } = useContext(AppConText);
+
+  // * lưu dữ liệu người dùng
+  const [data, setData] = useState({});
 
   const [idsession, setidsession] = useState(inforUser.session_id);
   const [dataUser, setdataUser] = useState({
@@ -108,9 +110,14 @@ const Profile = () => {
 
   // gọi api chi tiết người dùng
   const fetchData = async () => {
-    const response = await AxiosIntance().get(`/user/detail/${inforUser._id}`);
-    const apiData = response;
-    setData(apiData);
+    try {
+      const response = await AxiosIntance().get(
+        `/user/detail/${inforUser._id}`
+      );
+      setData(response);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
   };
 
   useEffect(() => {
@@ -124,16 +131,16 @@ const Profile = () => {
         style={styles.background}
       />
       <TouchableOpacity
+        onPress={()=> navigation.navigate("DetailUser")}
         style={{ position: "absolute", right: 30, marginTop: 10 }}
-        // !
       >
         <MaterialIcons name="edit" size={25} color={"white"} />
       </TouchableOpacity>
       <View style={styles.profile}>
         {/* thông tin tên email */}
         <View style={styles.infor}>
-          <Text style={styles.textName}>{inforUser.name}</Text>
-          <Text style={styles.textEmail}>{inforUser.email}</Text>
+          <Text style={styles.textName}>{data.name}</Text>
+          <Text style={styles.textEmail}>{data.email}</Text>
         </View>
 
         {/* các nút xử lý */}
@@ -141,7 +148,6 @@ const Profile = () => {
           <View>
             <TouchableOpacity
               style={[styles.frameContainer, { marginTop: 50 }]}
-              onPress={toggleModalChangePass}
             >
               <View style={styles.frameButton}>
                 <Image
@@ -187,7 +193,10 @@ const Profile = () => {
                 style={{ marginEnd: 10 }}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.frameContainer, {marginBottom: 10}]} onPress={toggleModalLogout}>
+            <TouchableOpacity
+              style={[styles.frameContainer, { marginBottom: 10 }]}
+              onPress={toggleModalLogout}
+            >
               <View style={styles.frameButton}>
                 <Image
                   style={styles.icon}
@@ -229,6 +238,7 @@ const Profile = () => {
         )}
       </View>
 
+      {/* Modal xác nhận đăng xuất */}
       <Modal isVisible={islogoutVisible}>
         <View style={styles.containerModal}>
           <Text style={styles.textModal}>Bạn chắc chắn muốn đăng xuất?</Text>
@@ -245,6 +255,8 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal đổi mật khẩu */}
       <Modal isVisible={isChangePasswordVisible}>
         <View style={styleModal.modalContainer}>
           <View style={styleModal.modalContent}>
@@ -289,6 +301,8 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
+
+      {/* Modal hỏi khi đổi mật khẩu */}
       <Modal isVisible={isStayLoggedInModalVisible}>
         <View style={styles.containerModal}>
           <Text style={styles.textModal}>Bạn có muốn duy trì đăng nhập?</Text>
@@ -308,6 +322,7 @@ const Profile = () => {
           </View>
         </View>
       </Modal>
+
     </View>
   );
 };
@@ -386,6 +401,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginStart: 20,
+    color: "#3e77b9",
   },
   textName: {
     color: "black",
@@ -397,14 +413,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "400",
     marginTop: 5,
-  },
-  frame: {
-    width: "95%",
-    height: "28%",
-    flexDirection: "row",
-    marginTop: 10,
-    marginStart: 20,
-    alignItems: "center",
   },
   frameIcon: {
     backgroundColor: "#f7f7f7",

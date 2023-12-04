@@ -100,7 +100,7 @@ const DetailStaff = ({ route }) => {
 
   const styleInput = {
 
-    activeOutlineColor: "#062446",
+    activeOutlineColor: "#0E55A7",
     outlineColor: "#8a8a8a",
     outlineStyle: { borderRadius: 10, borderWidth: 1.5 },
   };

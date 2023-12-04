@@ -26,6 +26,7 @@ import { useEffect } from "react";
 import AxiosIntance from "./AxiosIntance";
 import Client from "../components/Client";
 import { useNavigation } from "@react-navigation/native";
+import DetailUser from "../components/DetailUser";
 
 //splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -207,13 +208,6 @@ const PageHome = () => {
             headerBackTitle: "Quay lại",
             headerTitleAlign: "center",
             presentation: "modal",
-            // headerRight: () => (
-            //   <TouchableOpacity
-            //     style={{ marginRight: 20 }}
-            //   >
-            //     <MaterialIcons name="add" size={28} color="black" />
-            //   </TouchableOpacity>
-            // ),
           }}
         />
         <Stack.Screen
@@ -260,6 +254,16 @@ const PageProfile = () => {
         component={Profile}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="DetailUser"
+        component={DetailUser}
+        options={{
+          headerTitle: "Thông tin của bạn",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
     </Stack.Navigator>
   );
 };
@@ -274,6 +278,7 @@ const hideTabBar = (route) => {
     "ManagerStaff",
     "DetailStaff",
     "ManagerService",
+    "DetailUser",
   ];
 
   if (screensToHideTabBar.includes(routeName)) {
