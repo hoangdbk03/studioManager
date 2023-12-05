@@ -34,6 +34,17 @@ const FloatingButton = () => {
 
           labelStyle: {fontSize: 13}
         },
+        {
+          icon: require("../img/chart.png"),
+          label: "Thống kê",
+          // onPress: () => navigation.navigate('ManagerClient'),
+          labelTextColor: "white",
+          color: "white",
+          containerStyle: { backgroundColor: "#0E55A7" },
+          style: { backgroundColor: "#0E55A7"},
+
+          labelStyle: {fontSize: 13}
+        },
         inforUser.role !== "Quản lý" &&{
           icon: require("../icons/add-user.png"),
           label: "Đăng ký người dùng",

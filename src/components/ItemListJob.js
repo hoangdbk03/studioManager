@@ -6,13 +6,6 @@ import { format, parseISO } from "date-fns";
 const ItemListJob = (props) => {
   const { item } = props;
 
-  // chỉnh lại định dạng ngày bắt đầu
-  const createdDate = item ? item.started : null;
-  const dateTimeCreated = createdDate ? parseISO(createdDate) : null;
-  const formattedStart = dateTimeCreated
-    ? format(dateTimeCreated, "dd/MM/yyyy HH:mm:ss")
-    : null;
-
   return (
     <View style={styles.container}>
       <View style={styles.container1}>
@@ -42,7 +35,7 @@ const ItemListJob = (props) => {
         <Text style={styles.textStatus}>{item.status}</Text>
         <View style={{ height: 1, backgroundColor: "#e6e6e6" }}></View>
         <Text style={{ marginTop: 5, color: "#b0b0b0" }}>
-          Ngày bắt đầu: {formattedStart}
+          Ngày bắt đầu: {item.started}
         </Text>
       </View>
     </View>

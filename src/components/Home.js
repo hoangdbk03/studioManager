@@ -67,7 +67,7 @@ const Home = () => {
         const apiData = response;
         setDataListOrder(apiData);
       } catch (error) {
-        console.log("Gọi danh sách giỏ hàng", error);
+        
       }
     };
     fetchDataOrder();
