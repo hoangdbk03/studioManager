@@ -155,6 +155,7 @@ const Profile = ({ route }) => {
           <View>
             <TouchableOpacity
               style={[styles.frameContainer, { marginTop: 50 }]}
+              onPress={toggleModalChangePass}
             >
               <View style={styles.frameButton}>
                 <Image
