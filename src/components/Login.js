@@ -23,8 +23,8 @@ const Login = () => {
   
   const { setisLogin, setinforUser } = useContext(AppConText);
 
-  const [emailUser, setemailUser] = useState("choandgirl@gmail.com");
-  const [passwordUser, setpasswordUser] = useState("123");
+  const [emailUser, setemailUser] = useState("");
+  const [passwordUser, setpasswordUser] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
