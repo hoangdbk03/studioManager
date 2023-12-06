@@ -47,19 +47,6 @@ const DetailStaff = ({ route }) => {
     item.citizenIdentityCard
   );
 
-  // chỉnh lại ngày tạo
-  const createdDate = item ? item.createdAt : null;
-  const dateTimeCreated = createdDate ? parseISO(createdDate) : null;
-  const formattedCreated = dateTimeCreated
-    ? format(dateTimeCreated, "dd/MM/yyyy HH:mm:ss")
-    : null;
-  //chỉnh lại ngày update
-  const updatedDate = item ? item.updatedAt : null;
-  const dateTimeUpdated = updatedDate ? parseISO(updatedDate) : null;
-  const formattedUpdate = dateTimeUpdated
-    ? format(dateTimeUpdated, "dd/MM/yyyy HH:mm:ss")
-    : null;
-
   const handleUpdate = async () => {
     try {
       setLoading(true);
@@ -208,7 +195,7 @@ const DetailStaff = ({ route }) => {
           <TextInput
             style={[styles.input, styles.inputRemaining]}
             mode="outlined"
-            value={formattedCreated}
+            value={item.createdAt}
             label="Ngày tạo"
             {...styleInput}
             disabled
@@ -216,7 +203,7 @@ const DetailStaff = ({ route }) => {
           <TextInput
             style={[styles.input, styles.inputRemaining]}
             mode="outlined"
-            value={formattedUpdate}
+            value={item.updatedAt}
             label="Cập nhật mới nhất"
             {...styleInput}
             disabled

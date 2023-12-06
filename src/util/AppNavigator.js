@@ -49,9 +49,9 @@ const Main = () => {
   const fetchCartCount = async () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
-      const cartData = response;
-      const itemCount = Array.isArray(cartData.services)
-        ? cartData.services.length
+      const cartData = response.services;
+      const itemCount = Array.isArray(cartData)
+        ? cartData.length
         : 0;
       setCartCount(itemCount);
     } catch (error) {}
