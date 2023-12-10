@@ -23,10 +23,9 @@ const Login = () => {
   
   const { setisLogin, setinforUser } = useContext(AppConText);
 
-  const [emailUser, setemailUser] = useState("");
-  const [passwordUser, setpasswordUser] = useState("");
+  const [emailUser, setemailUser] = useState("admin@example.com");
+  const [passwordUser, setpasswordUser] = useState("123456");
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigation();
 
   const goLogin = async () => {
     if (!emailUser || !passwordUser) {
@@ -279,6 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 50,
   },
   textButton: {
     fontSize: 20,

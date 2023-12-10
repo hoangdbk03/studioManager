@@ -60,10 +60,10 @@ const Main = () => {
   // TODO: kiểm tra data
   useEffect(() => {
     fetchCartCount();
-    const interval = setInterval(()=>{
-      fetchCartCount();
-    }, 3000);
-    return ()=> clearInterval(interval);
+    // const interval = setInterval(()=>{
+    //   fetchCartCount();
+    // }, 1000);
+    // return ()=> clearInterval(interval);
   }, []);
 
   return (
@@ -176,8 +176,6 @@ const Main = () => {
 // TODO: trang home
 const PageHome = () => {
   return (
-    <>
-      <FloatingButton />
       <Stack.Navigator initialRouteName="PageHome">
         <Stack.Screen
           name="PageHome"
@@ -236,7 +234,6 @@ const PageHome = () => {
           }}
         />
       </Stack.Navigator>
-    </>
   );
 };
 

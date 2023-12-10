@@ -15,7 +15,7 @@ const FloatingButton = () => {
 
   return (
     <FAB.Group
-      style={{ bottom: 84.5 }}
+      style={{ bottom: 150 }}
       backdropColor="rgba(225,225,225, 0)"
       fabStyle={{ backgroundColor: "#0E55A7" }}
       color="white"

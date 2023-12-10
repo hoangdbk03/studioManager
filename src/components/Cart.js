@@ -24,8 +24,6 @@ const Cart = () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
       const apiDataServices = response.services;
-      // const apiDataStaffs = response.staffs; // ! thay đổi thành services
-
       setData(apiDataServices);
     } catch (error) {
       
@@ -33,10 +31,10 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    fetchData();
     const interval = setInterval(()=>{
       fetchData();
-    }, 5000);
+    }, 1000);
+    fetchData();
     return ()=> clearInterval(interval);
   }, []);
 

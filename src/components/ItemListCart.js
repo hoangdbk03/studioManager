@@ -35,18 +35,18 @@ const ItemListCart = (props) => {
   };
 
   // TODO: Add API call to fetch list of employees
-  const fetchEmployees = async () => {
-    try {
-      const response = await AxiosIntance().get("/user/list");
-      const employeeData = response; // Update if API response structure is different
-      setEmployees(employeeData);
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-    }
-  };
-  useEffect(() => {
-    fetchEmployees();
-  });
+  // const fetchEmployees = async () => {
+  //   try {
+  //     const response = await AxiosIntance().get("/user/list");
+  //     const employeeData = response; // Update if API response structure is different
+  //     setEmployees(employeeData);
+  //   } catch (error) {
+  //     console.error("Error fetching employees:", error);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchEmployees();
+  // });
 
   // * định dạng lại tiền việt
   const formatCurrency = (amount) => {

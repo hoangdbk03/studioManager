@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   ImageBackground,
   ScrollView,
@@ -13,7 +14,7 @@ import React, { useContext, useState } from "react";
 import { AppConText } from "../util/AppContext";
 import AxiosIntance from "../util/AxiosIntance";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
@@ -26,6 +27,7 @@ const Profile = ({ route }) => {
   const [isChangePasswordVisible, setChangePasswordVisible] = useState(false);
   const [isStayLoggedInModalVisible, setStayLoggedInModalVisible] =
     useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // * lấy dữ liệu được lưu từ AppConText
   const { inforUser } = useContext(AppConText);
@@ -34,6 +36,7 @@ const Profile = ({ route }) => {
   // * lưu dữ liệu người dùng
   const [data, setData] = useState({});
 
+  // * các hàm đmk
   const [idsession, setidsession] = useState(inforUser.session_id);
   const [dataUser, setdataUser] = useState({
     oldpassword: "",
@@ -56,11 +59,11 @@ const Profile = ({ route }) => {
     try {
       const response = await AxiosIntance().get("/user/logout/" + idsession);
       if (response) {
-        setisLogin(false);
         Toast.show({
           type: "success",
           text1: "ĐĂNG XUẤT THÀNH CÔNG",
         });
+        setisLogin(false);
       }
     } catch (error) {
       Toast.show({
@@ -70,26 +73,32 @@ const Profile = ({ route }) => {
     }
   };
 
-  //gọi api xử lý đổi mk
+  // * Gọi api xử lý đổi mk
   const HandleChangePass = async () => {
-    if (dataUser.oldpassword.trim() === "" || dataUser.password.trim() === "") {
-      toggleModalChangePass();
-      Toast.show({
-        type: "info",
-        text1: "Vui lòng nhập đầy đủ thông tin!",
-      });
+    if (!dataUser.oldpassword || !dataUser.password) {
+      Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
+    } else if (dataUser.password !== confirmPassword) {
+      Alert.alert("Thông báo", "Mật khẩu mới không trùng khớp!");
+    } else if (dataUser.password.length < 6) {
+      Alert.alert("Thông báo", "Mật khẩu mới phải có ít nhất 6 ký tự!");
     } else {
       try {
-        await AxiosIntance().put(
+        // * gọi api
+        const response = await AxiosIntance().put(
           `/user/change-password/${inforUser._id}`,
           dataUser
         );
-        toggleModalChangePass();
-        showStayLoggedInModal();
-        Toast.show({
-          type: "success",
-          text1: "Đổi mật khẩu thành công",
-        });
+        // * kiểm tra mk cũ
+        if (response.status === true) {
+          Toast.show({
+            type: "success",
+            text1: "Đổi mật khẩu thành công",
+          });
+          toggleModalChangePass();
+          showStayLoggedInModal();
+        } else {
+          Alert.alert("Thông báo", "Mật khẩu cũ không chính xác!");
+        }
       } catch (error) {
         Toast.show({
           type: "error",
@@ -99,16 +108,15 @@ const Profile = ({ route }) => {
     }
   };
 
-  // xử lý logout
+  // * xử lý logout
   const handleStayLoggedInChoice = (stayLoggedIn) => {
     setStayLoggedInModalVisible(false);
     if (!stayLoggedIn) {
-      // Logout the user if they choose not to stay logged in
       logout();
     }
   };
 
-  // gọi api chi tiết người dùng
+  // * gọi api chi tiết người dùng
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get(
@@ -120,6 +128,14 @@ const Profile = ({ route }) => {
     }
   };
 
+  // !
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  // !
   useEffect(() => {
     if (route.params?.refresh) {
       fetchData();
@@ -291,6 +307,7 @@ const Profile = ({ route }) => {
               mode="outlined"
               label="Nhập lại mật khẩu mới"
               style={styles.textInput}
+              onChangeText={(text) => setConfirmPassword(text)}
             />
             <View style={styleModal.buttonModal}>
               <TouchableOpacity

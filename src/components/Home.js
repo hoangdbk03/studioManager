@@ -35,12 +35,29 @@ import { List } from "react-native-paper";
 import AxiosIntance from "../util/AxiosIntance";
 import ItemListJob from "./ItemListJob";
 
+// * màu của từng trạng thái
+const statusColors = {
+  "Tất cả": "#0E55A7",
+  "Chưa thực hiện": "red",
+  "Đang thực hiện": "#b59700",
+  "Hoàn thành": "green",
+  "Đã hủy" : "#b0b0b0"
+};
+
 const Home = () => {
   const navigation = useNavigation();
   const { inforUser } = useContext(AppConText);
   const [isModalVisible, setModalVisible] = useState(false);
   const [dataUser, setDataUser] = useState([]);
   const [dataListOrder, setDataListOrder] = useState([]);
+
+  // * lọc trạng thái
+  const [selectedStatus, setSelectedStatus] = useState("Tất cả");
+  const handleStatusFilter = (status) => {
+    setSelectedStatus(status);
+  };
+  // * lưu vị trí được chọn của trạng thái
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
 
   // * hiển thị modal staff
   const toggleModal = () => {
@@ -60,17 +77,20 @@ const Home = () => {
   };
 
   // TODO:  Xử lý api gọi danh sách đơn hàng
+  const fetchDataOrder = async () => {
+    try {
+      const response = await AxiosIntance().get("/order/list");
+      const apiData = response;
+      setDataListOrder(apiData);
+    } catch (error) {}
+  };
   useEffect(() => {
-    const fetchDataOrder = async () => {
-      try {
-        const response = await AxiosIntance().get("/order/list");
-        const apiData = response;
-        setDataListOrder(apiData);
-      } catch (error) {
-        
-      }
-    };
+    // const interval = setInterval(() => {
+    //     fetchDataOrder();
+    // }, 1000);;
     fetchDataOrder();
+
+    // return ()=> clearInterval(interval);
   }, []);
 
   // TODO: Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt
@@ -118,14 +138,47 @@ const Home = () => {
 
       {/* Phần thân */}
       <View style={styles.body}>
-        <Text style={styles.buttonOption}>Tất cả công việc</Text>
-        <FlatList
-          style={styles.body_list}
-          data={dataListOrder}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ItemListJob item={item} />}
-        />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.scrollFill}
+        >
+          {Object.keys(statusColors).map((status, index) => (
+            <TouchableOpacity
+              key={status}
+              onPress={() => {
+                handleStatusFilter(status);
+                setSelectedTabIndex(index);
+              }}
+              style={[
+                styles.buttonScroll,
+                {
+                  backgroundColor:
+                    selectedTabIndex === index ? statusColors[status] : "white",
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.textButton,
+                  { color: selectedTabIndex === index ? "white" : "#0E55A7" },
+                ]}
+              >
+                {status}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
+      <FlatList
+        style={styles.body_list}
+        data={dataListOrder.filter(
+          (item) =>
+            selectedStatus === "Tất cả" || item.status === selectedStatus
+        )}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => <ItemListJob item={item} />}
+      />
 
       {/* khung button nhân viên và gói chụp */}
       <View style={styles.mid_header_body}>
@@ -254,7 +307,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#313e4d",
   },
-
   mid_header_body: {
     width: "85%",
     height: 50,
@@ -333,25 +385,31 @@ const styles = StyleSheet.create({
     pointerEvents: "none",
   },
   body: {
-    height: "55%",
     width: "100%",
-    position: "absolute",
-    marginTop: "61%",
     backgroundColor: "white",
     borderRadius: 20,
+    marginTop: -55,
   },
   body_list: {
-    padding: 15,
+    padding: 16,
+    marginBottom: "21%",
   },
-  buttonOption: {
-    marginTop: "12%",
-    backgroundColor: "#0E55A7",
-    width: 120,
-    padding: 8,
-    borderRadius: 40,
+  textButton: {
     color: "white",
-    marginStart: 20,
     fontWeight: "500",
-    marginBottom: 5,
+  },
+  scrollFill: {
+    marginTop: 40,
+    padding: 10,
+  },
+  buttonScroll: {
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    marginHorizontal: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#e7eef6"
   },
 });

@@ -7,13 +7,13 @@ const SplashScreen = () => {
   const navigation = useNavigation();
   const translateY = useRef(new Animated.Value(0)).current;
 
-  const [showSplash, setshowSplash] = useState(true);
+  // const [showSplash, setshowSplash] = useState(true);
 
   const [showImgLogo, setshowImgLogo] = useState(true);
 
   useEffect(() => {
     const splashTimer = setTimeout(() => {
-      showSplash(false);
+      // showSplash(false);
       setshowImgLogo(false);
       Animated.timing(translateY, {
         toValue: -200,
@@ -29,16 +29,16 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      {showSplash && (
+      {/* {showSplash && ( */}
         <Animated.View style={[{ transform: [{ translateY }] }]}>
           <Image
             style={styles.img}
             source={require("../img/backgroundSpl.jpg")}
           ></Image>
         </Animated.View>
-      )}
+      {/* )} */}
 
-      {showSplash && (
+      {/* {showSplash && ( */}
         <View style={styles.containerLogo}>
           {showImgLogo && (
             <Animated.View style={{ transform: [{ translateY }] }}>
@@ -49,7 +49,7 @@ const SplashScreen = () => {
             </Animated.View>
           )}
         </View>
-      )}
+      {/* )} */}
     </View>
   );
 };
