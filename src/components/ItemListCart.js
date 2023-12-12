@@ -1,4 +1,5 @@
 import {
+  Alert,
   Image,
   StyleSheet,
   Text,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { TextInput } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
@@ -17,12 +18,14 @@ import Modal from "react-native-modal";
 // import {CheckBox} from "react-native-paper";
 import { styleModal } from "../style/styleModal";
 import { Checkbox } from "react-native-paper";
+import { AppConText } from "../util/AppContext";
 
 const ItemListCart = (props) => {
   const { item } = props;
   const [expanded, setExpanded] = useState(false);
   const [clients, setClients] = useState([]);
   const [dataClient, setDataClient] = useState("");
+  const { inforUser } = useContext(AppConText);
 
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -67,6 +70,61 @@ const ItemListCart = (props) => {
     fetchClients();
   }, []);
 
+  // TODO: xử lý thêm nhân viên vào giỏ hàng
+  const addStaffToCart = async (serviceId, staffId) => {
+    try {
+      // Gọi API để thêm nhân viên vào giỏ hàng
+      await AxiosIntance().post(`/cart/addStaffToCart/${inforUser._id}`, {
+        serviceID: serviceId,
+        staffID: staffId,
+      });
+      console.log("Thêm nv vào cart thành công");
+    } catch (error) {
+      console.error("Lỗi khi thêm nhân viên vào giỏ hàng:", error);
+      Alert.alert("Đã xảy ra lỗi khi thêm nhân viên vào giỏ hàng!");
+    }
+  };
+  // TODO: xử lý xóa nhân viên khỏi giỏ hàng
+  const removeStaffFromCart = async (serviceId, staffId) => {
+    try {
+      // Gọi API để loại bỏ nhân viên khỏi giỏ hàng
+      const response = await AxiosIntance().delete(
+        `/cart/removeStaffFromCart/${inforUser._id}`,
+        {
+          data: {
+            serviceID: serviceId,
+            staffID: staffId,
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Xóa nv khỏi cart thành công");
+    } catch (error) {
+      Alert.alert(
+        "Thông báo",
+        "Đã xảy ra lỗi khi loại bỏ nhân viên khỏi giỏ hàng"
+      );
+    }
+  };
+
+  // TODO: xử lý chọn checkbox
+  const handleEmployeeCheckbox = (employeeId) => {
+    if (selectedEmployees.includes(employeeId)) {
+      // Nếu đã chọn rồi thì loại bỏ khỏi danh sách và giỏ hàng
+      removeStaffFromCart(item.serviceID._id, employeeId);
+      setSelectedEmployees((prevSelected) =>
+        prevSelected.filter((id) => id !== employeeId)
+      );
+    } else {
+      // Nếu chưa chọn thì thêm vào danh sách và giỏ hàng
+      addStaffToCart(item.serviceID._id, employeeId);
+      setSelectedEmployees((prevSelected) => [...prevSelected, employeeId]);
+    }
+  };
+
+  // TODO: xử lý api lấy danh sách người dùng
   const fetchEmployees = async () => {
     try {
       const response = await AxiosIntance().get("/user/list");
@@ -79,16 +137,6 @@ const ItemListCart = (props) => {
   useEffect(() => {
     fetchEmployees();
   }, []);
-
-  const handleEmployeeCheckbox = (employeeId) => {
-    setSelectedEmployees((prevSelected) => {
-      if (prevSelected.includes(employeeId)) {
-        return prevSelected.filter((id) => id !== employeeId);
-      } else {
-        return [...prevSelected, employeeId];
-      }
-    });
-  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={toggleExpansion}>
@@ -156,7 +204,9 @@ const ItemListCart = (props) => {
               )}
               <TouchableOpacity
                 style={styles.buttonConfirm}
-                onPress={toggleEmployeeModal}
+                onPress={() => {
+                  toggleEmployeeModal();
+                }}
               >
                 <Text style={{ color: "white", fontWeight: "500" }}>
                   Xác nhận

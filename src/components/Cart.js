@@ -31,7 +31,7 @@ const Cart = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 5000);
+    }, 3000);
     fetchData();
     return () => clearInterval(interval);
   }, []);
