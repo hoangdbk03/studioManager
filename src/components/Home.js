@@ -41,7 +41,7 @@ const statusColors = {
   "Chưa thực hiện": "red",
   "Đang thực hiện": "#b59700",
   "Hoàn thành": "green",
-  "Đã hủy" : "#b0b0b0"
+  "Đã hủy": "#b0b0b0",
 };
 
 const Home = () => {
@@ -170,15 +170,40 @@ const Home = () => {
           ))}
         </ScrollView>
       </View>
-      <FlatList
-        style={styles.body_list}
-        data={dataListOrder.filter(
-          (item) =>
-            selectedStatus === "Tất cả" || item.status === selectedStatus
-        )}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <ItemListJob item={item} />}
-      />
+      {dataListOrder.length > 0 ? (
+        <FlatList
+          style={styles.body_list}
+          data={dataListOrder.filter(
+            (item) =>
+              selectedStatus === "Tất cả" || item.status === selectedStatus
+          )}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <ItemListJob item={item} />}
+        />
+      ) : (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <View
+            style={{
+              width: 150,
+              height: 150,
+              backgroundColor: "#e7eef6",
+              borderRadius: 300,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              style={{ width: 60, height: 60, tintColor: "#b4cae4" }}
+              source={require("../img/taskList.png")}
+            />
+          </View>
+          <Text style={{ color: "#545454", marginTop: 10 }}>
+            Chưa có công việc nào
+          </Text>
+        </View>
+      )}
 
       {/* khung button nhân viên và gói chụp */}
       <View style={styles.mid_header_body}>
@@ -401,6 +426,7 @@ const styles = StyleSheet.create({
   scrollFill: {
     marginTop: 40,
     padding: 10,
+    marginRight: 10,
   },
   buttonScroll: {
     borderRadius: 16,
@@ -409,7 +435,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 40,
-    borderWidth: 1,
-    borderColor: "#e7eef6"
+    borderWidth: 2,
+    borderColor: "#e7eef6",
   },
 });

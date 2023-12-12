@@ -25,6 +25,7 @@ import AxiosIntance from "./AxiosIntance";
 import Client from "../components/Client";
 import { useNavigation } from "@react-navigation/native";
 import DetailUser from "../components/DetailUser";
+import Statistical from "../components/Statistical";
 
 // TODO: splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -233,6 +234,16 @@ const PageHome = () => {
             presentation: "modal",
           }}
         />
+         <Stack.Screen
+          name="Statistical"
+          component={Statistical}
+          options={{
+            headerTitle: "Thống kê",
+            headerBackTitle: "Quay lại",
+            headerTitleAlign: "center",
+            presentation: "modal",
+          }}
+        />
       </Stack.Navigator>
   );
 };
@@ -271,6 +282,7 @@ const hideTabBar = (route) => {
     "DetailStaff",
     "ManagerService",
     "DetailUser",
+    "Statistical"
   ];
 
   if (screensToHideTabBar.includes(routeName)) {

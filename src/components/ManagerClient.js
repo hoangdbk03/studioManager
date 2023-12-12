@@ -1,4 +1,5 @@
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -14,12 +15,20 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { AppConText } from "../util/AppContext";
 import { styleModal } from "../style/styleModal";
 import ItemListClientAdmin from "./ItemListClientAdmin";
+import { Dropdown } from "react-native-element-dropdown";
+
+const genderOptions = [
+  { label: "Nam", value: "1" },
+  { label: "Nữ", value: "2" },
+  { label: "Khác", value: "3" },
+];
 
 const ManagerClient = () => {
   const [isAddModalVisible, setAddModalVisible] = useState(false);
   const [isUpdateModalVisible, setUpdateModalVisible] = useState(false);
   const [data, setdata] = useState([]);
   const { inforUser } = useContext(AppConText);
+  const [selectedGender, setSelectedGender] = useState("");
 
   //lưu giá trị được thêm
   const [addData, setaddData] = useState({
@@ -39,6 +48,7 @@ const ManagerClient = () => {
   //ẩn modal
   const toggleAddModal = () => {
     setAddModalVisible(!isAddModalVisible);
+    setSelectedGender("");
   };
   const toggleUpdateModal = () => {
     setUpdateModalVisible(!isUpdateModalVisible);
@@ -63,16 +73,16 @@ const ManagerClient = () => {
     if (
       addData.name.trim() === "" ||
       addData.address.trim() === "" ||
-      addData.phone.trim() === ""
+      addData.phone.trim() === "" ||
+      selectedGender.trim() === ""
     ) {
-      toggleAddModal();
-      Toast.show({
-        type: "info",
-        text1: "Vui lòng nhập đầy đủ thông tin!",
-      });
+      Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
     } else {
       try {
-        await AxiosIntance().post("/client/create", addData);
+        await AxiosIntance().post("/client/create", {
+          ...addData,
+          gender: selectedGender,
+        });
         Toast.show({
           type: "success",
           text1: "Thêm thành công",
@@ -93,19 +103,16 @@ const ManagerClient = () => {
     if (
       editedData.name.trim() === "" ||
       editedData.address.trim() === "" ||
-      editedData.phone.trim() === ""
+      editedData.phone.trim() === "" ||
+      selectedGender.trim() === ""
     ) {
-      toggleUpdateModal();
-      Toast.show({
-        type: "info",
-        text1: "Vui lòng nhập đầy đủ thông tin!",
-      });
+      Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
     } else {
       try {
-        await AxiosIntance().put(
-          "/client/update/" + editedData._id,
-          editedData
-        );
+        await AxiosIntance().put("/client/update/" + editedData._id, {
+          ...editedData,
+          gender: selectedGender,
+        });
         Toast.show({
           type: "success",
           text1: "Cập nhật thành công",
@@ -152,6 +159,7 @@ const ManagerClient = () => {
           <TouchableOpacity
             onPress={() => {
               setEditedData({ ...item });
+              setSelectedGender(item.gender);
               toggleUpdateModal();
             }}
           >
@@ -164,12 +172,13 @@ const ManagerClient = () => {
         )}
       />
 
+      {/* Floating button */}
       <TouchableOpacity style={styles.fab} onPress={toggleAddModal}>
         <MaterialIcons name="add" size={30} color="white" />
       </TouchableOpacity>
 
       {/* Modal thêm thông tin khách hàng mới */}
-      <Modal isVisible={isAddModalVisible}  style={styleModal.modalContainer}>
+      <Modal isVisible={isAddModalVisible} style={styleModal.modalContainer}>
         <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
@@ -182,6 +191,17 @@ const ManagerClient = () => {
               onChangeText={(text) => setaddData({ ...addData, name: text })}
               mode="outlined"
               label="Họ và tên"
+            />
+            <Dropdown
+              style={styles.dropdown}
+              placeholder="Giới tính"
+              labelField="label"
+              valueField="value"
+              data={genderOptions}
+              value={selectedGender}
+              onChange={(item) => {
+                setSelectedGender(item.label);
+              }}
             />
             <TextInput
               style={styleModal.textInput}
@@ -215,7 +235,7 @@ const ManagerClient = () => {
       </Modal>
 
       {/* Modal chỉnh sửa thông tin */}
-      <Modal isVisible={isUpdateModalVisible}  style={styleModal.modalContainer}>
+      <Modal isVisible={isUpdateModalVisible} style={styleModal.modalContainer}>
         <View>
           <View style={styleModal.modalContent}>
             <View style={styleModal.frameTitleModal}>
@@ -230,6 +250,17 @@ const ManagerClient = () => {
               }
               mode="outlined"
               label="Họ và tên"
+            />
+            <Dropdown
+              style={styles.dropdown}
+              placeholder={selectedGender || "Giới tính"}
+              labelField="label"
+              valueField="value"
+              data={genderOptions}
+              value={selectedGender}
+              onChange={(item) => {
+                setSelectedGender(item.label);
+              }}
             />
             <TextInput
               style={styleModal.textInput}
@@ -277,7 +308,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     flex: 1,
-    padding: 10
+    padding: 10,
   },
   modalContainer: {
     flex: 1,
@@ -296,10 +327,20 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: "center",
     justifyContent: "center",
-    right: 20,
-    bottom: 20,
+    left: 40,
+    bottom: 60,
     backgroundColor: "#0E55A7",
     borderRadius: 30,
     elevation: 8,
+  },
+  dropdown: {
+    width: 330,
+    height: 50,
+    borderColor: "#545454",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 8,
+    backgroundColor: "#f9f9f9",
+    marginTop: 10,
   },
 });

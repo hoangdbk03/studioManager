@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Image,
   Platform,
@@ -55,12 +56,14 @@ const ManagerService = () => {
     name: "",
     description: "",
     price: "",
+    imageQuantity: "",
   });
   // * lưu trữ dữ liệu cập nhật
   const [dataEdit, setDataEdit] = useState({
     name: "",
     description: "",
     price: "",
+    imageQuantity: "",
   });
   // * hiển thị modal thêm dịch vụ
   const toggleModalAdd = () => {
@@ -71,6 +74,7 @@ const ManagerService = () => {
         name: "",
         description: "",
         price: "",
+        imageQuantity: "",
       });
     }
   };
@@ -131,6 +135,7 @@ const ManagerService = () => {
       formData.append("name", dataAdd.name);
       formData.append("description", dataAdd.description);
       formData.append("price", dataAdd.price);
+      formData.append("imageQuantity", dataAdd.imageQuantity);
 
       // Kiểm tra xem hình ảnh có được chọn hay không trước khi thêm vào FormData
       if (imageUri) {
@@ -142,6 +147,12 @@ const ManagerService = () => {
           name: imageName,
           type: `image/${imageFileType}`,
         });
+      }
+
+      // validate
+      if (!dataAdd.name || !dataAdd.imageQuantity || !dataAdd.price) {
+        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!")
+        return;
       }
 
       await AxiosIntance().post("/service/create/", formData, {
@@ -171,6 +182,7 @@ const ManagerService = () => {
       formData.append("name", dataEdit.name);
       formData.append("description", dataEdit.description);
       formData.append("price", dataEdit.price);
+      formData.append("imageQuantity", dataEdit.imageQuantity);
 
       // Kiểm tra xem hình ảnh có được chọn hay không trước khi thêm vào FormData
       if (imageUri) {
@@ -183,6 +195,14 @@ const ManagerService = () => {
           type: `image/${imageFileType}`,
         });
       }
+
+      // validate
+      if (!dataEdit.name || !dataEdit.imageQuantity || !dataEdit.price) {
+        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!")
+        return;
+      }
+
+      console.log(formData);
 
       await AxiosIntance().put(
         `/service/update/${selectedItem._id}`,
@@ -198,6 +218,7 @@ const ManagerService = () => {
       toggleModalUpdate();
       fetchData();
     } catch (error) {
+      toggleModalUpdate();
       console.log("Update error", error);
       Toast.show({
         type: "error",
@@ -279,6 +300,7 @@ const ManagerService = () => {
         name: selectedItem.name || "",
         description: selectedItem.description || "",
         price: selectedItem.price ? selectedItem.price.toString() : "",
+        imageQuantity: selectedItem.imageQuantity ? selectedItem.imageQuantity.toString() : "",
       });
     }
   }, [selectedItem]);
@@ -362,6 +384,16 @@ const ManagerService = () => {
 
           <TextInput
             style={styleModal.textInput}
+            onChangeText={(text) =>
+              setDataAdd({ ...dataAdd, imageQuantity: text })
+            }
+            mode="outlined"
+            label="Số lượng ảnh"
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
             onChangeText={(text) => {
               setDataAdd({ ...dataAdd, price: text.replace(/[^0-9]/g, "") });
             }}
@@ -369,19 +401,6 @@ const ManagerService = () => {
             label="Giá tiền"
             keyboardType="numeric"
             value={formatCurrency(dataAdd.price)}
-          />
-
-          <TextInput
-            style={styleModal.textInput}
-            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
-            mode="outlined"
-            label="Số lượng ảnh"
-          />
-          <TextInput
-            style={styleModal.textInput}
-            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
-            mode="outlined"
-            label="Thời lượng chụp"
           />
 
           <TextInput
@@ -432,25 +451,22 @@ const ManagerService = () => {
 
           <TextInput
             style={styleModal.textInput}
+            value={dataEdit.imageQuantity}
+            onChangeText={(text) => setDataEdit({ ...dataEdit, imageQuantity: text })}
+            mode="outlined"
+            label="Số lượng ảnh"
+            keyboardType="numeric"
+          />
+
+          <TextInput
+            style={styleModal.textInput}
             value={formatCurrency(dataEdit.price)}
             onChangeText={(text) =>
               setDataEdit({ ...dataEdit, price: text.replace(/[^0-9]/g, "") })
             }
             mode="outlined"
             label="Giá tiền"
-          />
-
-          <TextInput
-            style={styleModal.textInput}
-            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
-            mode="outlined"
-            label="Số lượng ảnh"
-          />
-          <TextInput
-            style={styleModal.textInput}
-            // onChangeText={(text) => setDataAdd({ ...dataAdd, name: text })}
-            mode="outlined"
-            label="Thời lượng chụp"
+            keyboardType="numeric"
           />
 
           <TextInput
@@ -508,24 +524,17 @@ const ManagerService = () => {
               />
               <TextInput
                 style={styleModal.textInput}
-                value={formatCurrency(selectedItemForModal.price)}
-                disabled={true}
-                mode="outlined"
-                label="Giá tiền"
-              />
-              <TextInput
-                style={styleModal.textInput}
-                // value={selectedItemForModal.name}
+                value={selectedItemForModal.imageQuantity.toString()}
                 disabled={true}
                 mode="outlined"
                 label="Số lượng ảnh"
               />
               <TextInput
                 style={styleModal.textInput}
-                // value={selectedItemForModal.name}
+                value={formatCurrency(selectedItemForModal.price)}
                 disabled={true}
                 mode="outlined"
-                label="Thời lượng chụp"
+                label="Giá tiền"
               />
               <TextInput
                 style={[
@@ -607,7 +616,7 @@ const styles = StyleSheet.create({
   },
   floatingAdd: {
     position: "absolute",
-    bottom: 200,
+    bottom: 190,
     right: 20,
     alignItems: "center",
     borderRadius: 100,

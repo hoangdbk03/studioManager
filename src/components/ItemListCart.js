@@ -14,8 +14,9 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useEffect } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import Modal from "react-native-modal";
-import { CheckBox } from "react-native-paper";
+// import {CheckBox} from "react-native-paper";
 import { styleModal } from "../style/styleModal";
+import { Checkbox } from "react-native-paper";
 
 const ItemListCart = (props) => {
   const { item } = props;
@@ -23,30 +24,14 @@ const ItemListCart = (props) => {
   const [clients, setClients] = useState([]);
   const [dataClient, setDataClient] = useState("");
 
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-  const [selectedEmployees, setSelectedEmployees] = useState([]);
-
-  // *
 
   // * hiển thị modal
   const toggleEmployeeModal = () => {
     setShowEmployeeModal(!showEmployeeModal);
   };
-
-  // TODO: Add API call to fetch list of employees
-  // const fetchEmployees = async () => {
-  //   try {
-  //     const response = await AxiosIntance().get("/user/list");
-  //     const employeeData = response; // Update if API response structure is different
-  //     setEmployees(employeeData);
-  //   } catch (error) {
-  //     console.error("Error fetching employees:", error);
-  //   }
-  // };
-  // useEffect(() => {
-  //   fetchEmployees();
-  // });
 
   // * định dạng lại tiền việt
   const formatCurrency = (amount) => {
@@ -78,10 +63,32 @@ const ItemListCart = (props) => {
       console.error("Error fetching clients:", error);
     }
   };
-
   useEffect(() => {
     fetchClients();
   }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await AxiosIntance().get("/user/list");
+      const employeeData = response;
+      setEmployees(employeeData);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách nhân viên:", error);
+    }
+  };
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const handleEmployeeCheckbox = (employeeId) => {
+    setSelectedEmployees((prevSelected) => {
+      if (prevSelected.includes(employeeId)) {
+        return prevSelected.filter((id) => id !== employeeId);
+      } else {
+        return [...prevSelected, employeeId];
+      }
+    });
+  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={toggleExpansion}>
@@ -104,7 +111,7 @@ const ItemListCart = (props) => {
             searchPlaceholder="Tìm kiếm..."
             labelField="label"
             valueField="value"
-            placeholder="Khách hàng"
+            placeholder="Chọn khách hàng"
             containerStyle={{ borderRadius: 10 }}
             style={styles.dropdown}
             value={dataClient}
@@ -117,17 +124,46 @@ const ItemListCart = (props) => {
             }}
             onChangeText={(value) => setDataClient(value)}
           />
-          <TouchableOpacity style={{ marginTop: 10 }}>
+          <TouchableOpacity
+            style={{ marginTop: 10 }}
+            onPress={toggleEmployeeModal}
+          >
             <Text>Nhân viên phụ trách</Text>
           </TouchableOpacity>
 
-          {/* dữ liệu giả */}
-          <View>
-            <Text>Nguyễn Duy Đạt - Photographer</Text>
-            {/* Các dữ liệu giả khác */}
-            <Text>Lê Thị Hoa - Meakup</Text>
-            <Text>Hồ Hậu - Hậu kì</Text>
-          </View>
+          {/* Modal hiển thị danh sách chọn nhân viên */}
+          <Modal
+            isVisible={showEmployeeModal}
+            onBackdropPress={toggleEmployeeModal}
+            style={styles.modalContainer}
+          >
+            <View style={styles.modalContent}>
+              {employees.map(
+                (employee) =>
+                  employee.role === "Nhân viên" && (
+                    <View key={employee._id} style={styles.employeeItem}>
+                      <Checkbox
+                        status={
+                          selectedEmployees.includes(employee._id)
+                            ? "checked"
+                            : "unchecked"
+                        }
+                        onPress={() => handleEmployeeCheckbox(employee._id)}
+                      />
+                      <Text>{`${employee.name} - ${employee.job}`}</Text>
+                    </View>
+                  )
+              )}
+              <TouchableOpacity
+                style={styles.buttonConfirm}
+                onPress={toggleEmployeeModal}
+              >
+                <Text style={{ color: "white", fontWeight: "500" }}>
+                  Xác nhận
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
 
           <View style={{ marginTop: 10 }}>
             <Text>Thời gian bắt đầu</Text>
@@ -164,10 +200,6 @@ const ItemListCart = (props) => {
           </TouchableOpacity>
         </View>
       )}
-      <Modal isVisible={showEmployeeModal}>
-        <View style={styleModal.modalContainer}></View>
-        <Text onPress={toggleEmployeeModal}>Đóng</Text>
-      </Modal>
     </TouchableOpacity>
   );
 };
@@ -223,5 +255,22 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+  },
+  employeeItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  modalContainer: {
+    margin: 0,
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 22,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)",
   },
 });

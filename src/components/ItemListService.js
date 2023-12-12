@@ -12,11 +12,16 @@ import Toast from "react-native-toast-message";
 import AxiosIntance from "../util/AxiosIntance";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
 
 const ItemListService = (props) => {
-  const { item, onAddToCart, onRemoveFromCart, onEdit, onDelete, onModal } = props;
+  const { item, onAddToCart, onRemoveFromCart, onEdit, onDelete, onModal } =
+    props;
+  const [isAddToCartVisible, setAddToCartVisible] = useState(true);
+  const [initialAddToCartVisible, setInitialAddToCartVisible] = useState(true);
   const { inforUser } = useContext(AppConText);
   const [inCart, setInCart] = useState(false);
+  const navigation = useNavigation();
 
   const formatPrice = (price) => {
     const formattedPrice = new Intl.NumberFormat("vi-VN", {
@@ -26,35 +31,38 @@ const ItemListService = (props) => {
     return formattedPrice.replace(/\s₫/g, "");
   };
 
-  const addToCart = async () => {
-    const idAddCart = {
-      userID: inforUser._id,
-      serviceID: item._id,
-    };
+  const idAddCart = {
+    userID: inforUser._id,
+    serviceID: item._id,
+  };
 
+  const deleteToCart = async () => {
+    await AxiosIntance().delete("/cart/removeServiceFromCart/", {
+      data: idAddCart,
+    });
+    Toast.show({
+      type: "success",
+      text1: "Đã xóa khỏi giỏ hàng",
+    });
+    onRemoveFromCart();
+    setAddToCartVisible(true);
+    setInitialAddToCartVisible(true);
+  };
+
+  const addToCart = async () => {
     try {
-      if (inCart) {
-        await AxiosIntance().delete("/cart/removeServiceFromCart/", {
-          data: idAddCart,
-        });
-        Toast.show({
-          type: "success",
-          text1: "Đã xóa khỏi giỏ hàng",
-        });
-        onRemoveFromCart();
-      } else {
-        await AxiosIntance().post("/cart/addServiceToCart/", idAddCart);
-        onAddToCart();
-        Toast.show({
-          type: "success",
-          text1: "Thêm thành công vào giỏ hàng",
-        });
-      }
-      setInCart(!inCart);
+      await AxiosIntance().post("/cart/addServiceToCart/", idAddCart);
+      onAddToCart();
+      Toast.show({
+        type: "success",
+        text1: "Thêm thành công vào giỏ hàng",
+      });
+      setAddToCartVisible(false);
+      setInitialAddToCartVisible(false);
     } catch (error) {
       Toast.show({
         type: "info",
-        text1: "Dịch vụ đã tồn tại trong giỏ hàng",
+        text1: "Thêm vào giỏ hàng thất bại",
       });
     }
   };
@@ -69,6 +77,16 @@ const ItemListService = (props) => {
       onDelete(item);
     }
   };
+
+  useEffect(() => {
+    // Set the initial button visibility when the component mounts
+    setInitialAddToCartVisible(true);
+  }, []);
+
+  useEffect(() => {
+    // Reset the button visibility when 'item' changes
+    setAddToCartVisible(initialAddToCartVisible);
+  }, [item, initialAddToCartVisible]);
 
   return (
     <View style={styles.container}>
@@ -86,11 +104,13 @@ const ItemListService = (props) => {
         <Text style={styles.textPrice}>{formatPrice(item.price)}₫</Text>
       </View>
 
-      <View style={{height: 0.8, backgroundColor: '#b0b0b0', borderRadius: 20}}/>
+      <View
+        style={{ height: 0.8, backgroundColor: "#b0b0b0", borderRadius: 20 }}
+      />
 
       {/* Xem chi tiết */}
       <View>
-        <TouchableOpacity onPress={()=> onModal(item)}>
+        <TouchableOpacity onPress={() => onModal(item)}>
           <View style={styles.detailUser}>
             <Text style={{ color: "#90b1d7", marginStart: 5, fontSize: 13 }}>
               Xem chi tiết...
@@ -107,11 +127,17 @@ const ItemListService = (props) => {
 
       {/* Các nút thêm sửa xóa */}
       {inforUser.role === "Nhân viên" ? null : (
-        <TouchableOpacity style={styles.buttonAdd} onPress={addToCart}>
-          <Text style={styles.textButton}>
-            {inCart ? "Hủy" : "Thêm vào giỏ hàng"}
-          </Text>
-        </TouchableOpacity>
+        <View>
+          {isAddToCartVisible ? (
+            <TouchableOpacity style={styles.buttonAdd} onPress={addToCart}>
+              <Text style={styles.textButton}>Thêm vào giỏ hàng</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.buttonAdd} onPress={deleteToCart}>
+              <Text style={styles.textButton}>Hủy</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
       {inforUser.role === "Nhân viên" ? null : (
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>

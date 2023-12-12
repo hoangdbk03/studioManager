@@ -37,7 +37,7 @@ const FloatingButton = () => {
         {
           icon: require("../img/chart.png"),
           label: "Thống kê",
-          // onPress: () => navigation.navigate('ManagerClient'),
+          onPress: () => navigation.navigate('Statistical'),
           labelTextColor: "white",
           color: "white",
           containerStyle: { backgroundColor: "#0E55A7" },
