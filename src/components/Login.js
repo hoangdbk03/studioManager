@@ -18,14 +18,54 @@ import AxiosIntance from "../util/AxiosIntance";
 import { AppConText } from "../util/AppContext";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
-  
   const { setisLogin, setinforUser } = useContext(AppConText);
+  const navigation = useNavigation();
 
-  const [emailUser, setemailUser] = useState("admin@example.com");
-  const [passwordUser, setpasswordUser] = useState("123456");
+  const [emailUser, setemailUser] = useState("");
+  const [passwordUser, setpasswordUser] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // * ẩn hoặc hiển thị password
+  const [isPasswordVisible, setisPasswordVisible] = useState(false);
+
+  const [translateY] = useState(new Animated.Value(500));
+
+  const togglePasswordVisibility = () => {
+    setisPasswordVisible(!isPasswordVisible);
+  };
+
+  // * ghi nhớ tài khoản
+  const [rememberCredentials, setRememberCredentials] = useState(false);
+
+  useEffect(() => {
+    const loadCredentials = async () => {
+      try {
+        const storedEmail = await AsyncStorage.getItem("emailUser");
+        const storedPassword = await AsyncStorage.getItem("passwordUser");
+        const storedRemember = await AsyncStorage.getItem("rememberCredentials");
+
+        if (storedRemember && storedEmail && storedPassword) {
+          setemailUser(storedEmail);
+          setpasswordUser(storedPassword);
+          setRememberCredentials(true);
+
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration: 500,
+            easing: Easing.ease,
+            useNativeDriver: false,
+          }).start();
+        }
+      } catch (error) {
+        console.error("Lỗi tải thông tin đăng nhập", error);
+      }
+    };
+
+    loadCredentials();
+  }, [translateY]);
 
   const goLogin = async () => {
     if (!emailUser || !passwordUser) {
@@ -50,6 +90,18 @@ const Login = () => {
         });
         setisLogin(true);
         setinforUser(response);
+
+        // lưu thông tin đăng nhập nếu được chọn 
+        if (rememberCredentials) {
+          await AsyncStorage.setItem("emailUser", emailUser);
+          await AsyncStorage.setItem("passwordUser", passwordUser);
+          await AsyncStorage.setItem("rememberCredentials", "true");
+        } else {
+          // Xóa thông tin đăng nhập nếu bỏ chọn
+          await AsyncStorage.removeItem("emailUser");
+          await AsyncStorage.removeItem("passwordUser");
+          await AsyncStorage.removeItem("rememberCredentials");
+        }
       } else {
         Toast.show({
           type: "error",
@@ -61,18 +113,9 @@ const Login = () => {
         type: "error",
         text1: "EMAIL KHÔNG TỒN TẠI!",
       });
-    }finally{
+    } finally {
       setLoading(false);
     }
-  };
-
-  const [isPasswordVisible, setisPasswordVisible] = useState(false);
-  const [checked, setchecked] = useState(false);
-
-  const translateY = new Animated.Value(500);
-
-  const togglePasswordVisibility = () => {
-    setisPasswordVisible(!isPasswordVisible);
   };
 
   useEffect(() => {
@@ -87,7 +130,6 @@ const Login = () => {
   return (
     //hình logo
     <ScrollView style={styles.container}>
-      
       <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
       <Image style={styles.imgFont} source={require("../img/fontBack.png")} />
 
@@ -147,14 +189,14 @@ const Login = () => {
           <View style={styles.checkBox}>
             <View style={styles.checkBox}>
               <Checkbox
-                status={checked ? "checked" : "unchecked"}
+                status={rememberCredentials  ? "checked" : "unchecked"}
                 onPress={() => {
-                  setchecked(!checked);
+                  setRememberCredentials(!rememberCredentials);
                 }}
                 color="#0E55A7"
                 uncheckedColor="#0E55A7"
               />
-              <Text style={{ color: "#0E55A7", top: 8 }}>Ghi nhớ mật khẩu</Text>
+              <Text style={{ color: "#0E55A7", top: 8 }}>Ghi nhớ tài khoản</Text>
             </View>
             <Text
               style={{
@@ -163,6 +205,7 @@ const Login = () => {
                 color: "#0E55A7",
                 textDecorationLine: "underline",
               }}
+              onPress={() => navigation.navigate("ForgotPassword")}
             >
               Quên mật khẩu?
             </Text>
@@ -176,8 +219,8 @@ const Login = () => {
       </Animated.View>
       {loading && (
         <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0E55A7" />
-      </View>
+          <ActivityIndicator size="large" color="#0E55A7" />
+        </View>
       )}
     </ScrollView>
   );
@@ -191,7 +234,7 @@ const styles = StyleSheet.create({
   },
   img: {
     width: "100%",
-    height:  225,
+    height: 225,
     marginTop: 30,
   },
   imgFont: {

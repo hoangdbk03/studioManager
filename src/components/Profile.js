@@ -191,21 +191,6 @@ const Profile = ({ route }) => {
               <View style={styles.frameButton}>
                 <Image
                   style={styles.icon}
-                  source={require("../icons/support.png")}
-                />
-                <Text style={styles.textButton}>Trợ giúp</Text>
-              </View>
-              <MaterialIcons
-                name="navigate-next"
-                size={20}
-                color={"gray"}
-                style={{ marginEnd: 10 }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.frameContainer}>
-              <View style={styles.frameButton}>
-                <Image
-                  style={styles.icon}
                   source={require("../icons/info.png")}
                 />
                 <Text style={styles.textButton}>Thông tin ứng dụng</Text>

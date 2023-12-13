@@ -26,6 +26,8 @@ import Client from "../components/Client";
 import { useNavigation } from "@react-navigation/native";
 import DetailUser from "../components/DetailUser";
 import Statistical from "../components/Statistical";
+import ForgotPassword from "../components/ForgotPassword";
+import Salary from "../components/Salary";
 
 // TODO: splashScreen, login (Stack)
 const Stack = createStackNavigator();
@@ -37,6 +39,11 @@ const Users = () => {
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPassword}
+        options={{ headerShown: true, title: "Gửi lại mật khẩu"}}
+      />
     </Stack.Navigator>
   );
 };
@@ -51,9 +58,7 @@ const Main = () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
       const cartData = response.services;
-      const itemCount = Array.isArray(cartData)
-        ? cartData.length
-        : 0;
+      const itemCount = Array.isArray(cartData) ? cartData.length : 0;
       setCartCount(itemCount);
     } catch (error) {}
   };
@@ -177,74 +182,84 @@ const Main = () => {
 // TODO: trang home
 const PageHome = () => {
   return (
-      <Stack.Navigator initialRouteName="PageHome">
-        <Stack.Screen
-          name="PageHome"
-          component={Home}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="ManagerStaff"
-          component={ManagerStaff}
-          options={{
-            headerTitle: "Quản lý nhân viên",
-            headerBackTitle: "Quay lại",
-            presentation: "modal",
-          }}
-        />
-        <Stack.Screen
-          name="DetailStaff"
-          component={DetailStaff}
-          options={{
-            headerTitle: "Thông tin nhân viên",
-            headerStyle: { backgroundColor: "#062446", elevation: 0 },
-            headerTitleAlign: "center",
-            headerTintColor: "white",
-            headerBackTitle: "Quay lại",
-            presentation: "transparentModal",
-          }}
-        />
-        <Stack.Screen
-          name="ManagerService"
-          component={ManagerService}
-          options={{
-            headerTitle: "Dịch vụ",
-            headerBackTitle: "Quay lại",
-            headerTitleAlign: "center",
-            presentation: "modal",
-          }}
-        />
-        <Stack.Screen
-          name="ManagerClient"
-          component={ManagerClient}
-          options={{
-            headerTitle: "Quản lý khách hàng",
-            headerBackTitle: "Quay lại",
-            headerTitleAlign: "center",
-            presentation: "modal",
-          }}
-        />
-        <Stack.Screen
-          name="Register"
-          component={Register}
-          options={{
-            headerTitle: "Đăng ký người dùng",
-            headerBackTitle: "Quay lại",
-            headerTitleAlign: "center",
-            presentation: "modal",
-          }}
-        />
-         <Stack.Screen
-          name="Statistical"
-          component={Statistical}
-          options={{
-            headerTitle: "Thống kê",
-            headerBackTitle: "Quay lại",
-            headerTitleAlign: "center",
-            presentation: "modal",
-          }}
-        />
-      </Stack.Navigator>
+    <Stack.Navigator initialRouteName="PageHome">
+      <Stack.Screen
+        name="PageHome"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ManagerStaff"
+        component={ManagerStaff}
+        options={{
+          headerTitle: "Quản lý nhân viên",
+          headerBackTitle: "Quay lại",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="DetailStaff"
+        component={DetailStaff}
+        options={{
+          headerTitle: "Thông tin nhân viên",
+          headerStyle: { backgroundColor: "#062446", elevation: 0 },
+          headerTitleAlign: "center",
+          headerTintColor: "white",
+          headerBackTitle: "Quay lại",
+          presentation: "transparentModal",
+        }}
+      />
+      <Stack.Screen
+        name="ManagerService"
+        component={ManagerService}
+        options={{
+          headerTitle: "Dịch vụ",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="ManagerClient"
+        component={ManagerClient}
+        options={{
+          headerTitle: "Quản lý khách hàng",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="Register"
+        component={Register}
+        options={{
+          headerTitle: "Đăng ký người dùng",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="Statistical"
+        component={Statistical}
+        options={{
+          headerTitle: "Thống kê",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="Salary"
+        component={Salary}
+        options={{
+          headerTitle: "Lương thưởng nhân viên",
+          headerBackTitle: "Quay lại",
+          headerTitleAlign: "center",
+          presentation: "modal",
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 
@@ -282,7 +297,8 @@ const hideTabBar = (route) => {
     "DetailStaff",
     "ManagerService",
     "DetailUser",
-    "Statistical"
+    "Statistical",
+    "Salary"
   ];
 
   if (screensToHideTabBar.includes(routeName)) {

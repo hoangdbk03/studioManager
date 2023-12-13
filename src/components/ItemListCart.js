@@ -1,6 +1,7 @@
 import {
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
@@ -15,7 +16,6 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useEffect } from "react";
 import AxiosIntance from "../util/AxiosIntance";
 import Modal from "react-native-modal";
-// import {CheckBox} from "react-native-paper";
 import { styleModal } from "../style/styleModal";
 import { Checkbox } from "react-native-paper";
 import { AppConText } from "../util/AppContext";
@@ -25,11 +25,12 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Toast from "react-native-toast-message";
 
 const ItemListCart = (props) => {
-  const { item, staffs } = props;
+  const { item, staffs, key } = props;
   const [expanded, setExpanded] = useState(false);
   const [clients, setClients] = useState([]);
   const [dataClient, setDataClient] = useState("");
   const { inforUser } = useContext(AppConText);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
 
   // * 2 trường địa chỉ và ghi chú
   const [locationValue, setLocationValue] = useState("");
@@ -48,9 +49,14 @@ const ItemListCart = (props) => {
   const [endTime, setEndTime] = useState("");
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
 
-  // * hiển thị modal
+  // * hiển thị modal danh sách nhân viên
   const toggleEmployeeModal = () => {
     setShowEmployeeModal(!showEmployeeModal);
+  };
+
+  // * hiển thị modal xóa
+  const toggleRemoveModal = () => {
+    setShowRemoveModal(!showRemoveModal);
   };
 
   // * định dạng lại tiền việt
@@ -136,16 +142,19 @@ const ItemListCart = (props) => {
         deadline: endTime,
         location: locationValue,
         note: noteValue,
-      }
-      await AxiosIntance().post(`/order/confirmOrder/${inforUser._id}`, orderData);
+      };
+      await AxiosIntance().post(
+        `/order/confirmOrder/${inforUser._id}`,
+        orderData
+      );
       Toast.show({
         type: "success",
-        text1: "Xác nhận đơn hàng thành công"
+        text1: "Xác nhận đơn hàng thành công",
       });
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: "Xác nhận đơn hàng thất bại"
+        text1: "Xác nhận đơn hàng thất bại",
       });
     }
   };
@@ -179,6 +188,33 @@ const ItemListCart = (props) => {
     fetchEmployees();
   }, []);
 
+  // TODO: xử lý api xóa dịch vụ khỏi giỏ hàng
+  const handleRemoveService = async (serviceId) => {
+    try {
+      // Gọi API để loại bỏ dịch vụ khỏi giỏ hàng
+      const response = await AxiosIntance().delete(
+        `/cart/removeServiceFromCart/`,
+        {
+          data: {
+            userID: inforUser._id,
+            serviceID: serviceId,
+          },
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      Toast.show({
+        type: "success",
+        text1: "Xóa dịch vụ khỏi giỏ hàng thành công",
+      });
+      toggleRemoveModal();
+    } catch (error) {
+      console.error("Lỗi khi xóa dịch vụ khỏi giỏ hàng:", error);
+      Alert.alert("Đã xảy ra lỗi khi xóa dịch vụ khỏi giỏ hàng!");
+    }
+  };
+
   // TODO: xử lý hiển thị và format date thời gian bắt đầu
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -207,7 +243,11 @@ const ItemListCart = (props) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.header} onPress={toggleExpansion}>
+      <TouchableOpacity
+        style={styles.header}
+        onPress={toggleExpansion}
+        onLongPress={toggleRemoveModal}
+      >
         <Image style={styles.image} source={{ uri: item.serviceID.image }} />
         <View style={styles.infoService}>
           <Text style={styles.textName}>{item.serviceID.name}</Text>
@@ -245,7 +285,7 @@ const ItemListCart = (props) => {
             <TouchableOpacity
               style={{
                 marginTop: 10,
-                borderWidth: 1,
+                borderWidth: 0.5,
                 width: 30,
                 alignItems: "center",
                 marginBottom: 5,
@@ -287,6 +327,7 @@ const ItemListCart = (props) => {
                     </View>
                   )
               )}
+
               <TouchableOpacity
                 style={styles.buttonConfirm}
                 onPress={() => {
@@ -373,11 +414,50 @@ const ItemListCart = (props) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmOder}>
+          <TouchableOpacity
+            style={styles.buttonConfirm}
+            onPress={handleConfirmOder}
+          >
             <Text style={{ color: "white", fontWeight: "500" }}>Xác nhận</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Modal xóa dịch vụ */}
+      <Modal isVisible={showRemoveModal} onBackdropPress={toggleRemoveModal}>
+        <TouchableOpacity
+          style={styles.modalRemove}
+          onPress={() => {
+            // Hiển thị cảnh báo xác nhận xóa
+            Alert.alert(
+              "Xác nhận",
+              "Bạn có chắc chắn muốn xóa dịch vụ này khỏi giỏ hàng?",
+              [
+                {
+                  text: "Hủy",
+                  onPress: () => {
+                    toggleRemoveModal();
+                  },
+                  style: "cancel",
+                },
+                {
+                  text: "Xác nhận",
+                  onPress: () => {
+                    toggleRemoveModal();
+                    handleRemoveService(item.serviceID._id);
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          }}
+        >
+          <View style={{flexDirection: 'row'}}>
+          <Text style={{color: '#fc6261', fontWeight: 'bold'}}>Xóa dịch vụ</Text>
+          <Text> - {item.serviceID.name}</Text>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -462,5 +542,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 10,
     marginBottom: 2,
+  },
+  modalRemove: {
+    width: "100%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
   },
 });

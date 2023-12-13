@@ -72,8 +72,7 @@ const Home = () => {
   // * chuyển đến trang Salary
   const handleNextSalary = () => {
     setModalVisible(false);
-
-    //navigation.navigate("ManagerStaff");
+    navigation.navigate("Salary");
   };
 
   // TODO:  Xử lý api gọi danh sách đơn hàng
@@ -272,7 +271,7 @@ const Home = () => {
                 )}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.fontItemModal}>
+            <TouchableOpacity style={styles.fontItemModal} onPress={handleNextSalary}>
               <List.Item
                 title="Lương"
                 description="Lương nhân viên"

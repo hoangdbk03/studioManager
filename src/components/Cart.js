@@ -60,7 +60,7 @@ const Cart = () => {
           style={{ marginBottom: "21%" }}
           data={data}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ItemListCart item={item} staffs={staffs}/>}
+          renderItem={({ item }) => <ItemListCart key={item._id} item={item} staffs={staffs}/>}
         />
       ) : (
         <View
