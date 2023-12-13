@@ -1,14 +1,17 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useContext, useState } from "react";
 import { ScrollView } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import AxiosIntance from "../util/AxiosIntance";
 import { AppConText } from "../util/AppContext";
+import Modal from "react-native-modal";
+import { styleModal } from "../style/styleModal";
 
 const ItemListJob_role = (props) => {
   const { item } = props;
   const [selectedStatus, setSelectedStatus] = useState(item.status);
   const { inforUser } = useContext(AppConText);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   let statusBackgroundColor;
 
@@ -78,9 +81,7 @@ const ItemListJob_role = (props) => {
 
           <View style={{ width: "100%", alignItems: "flex-end" }}>
             {inforUser.role === "Nhân viên" ? (
-              <Text style={{ marginTop: 5}}>
-                {item.status}
-              </Text>
+              <Text style={{ marginTop: 5 }}>{item.status}</Text>
             ) : (
               <Dropdown
                 style={styles.dropdown}
@@ -88,6 +89,7 @@ const ItemListJob_role = (props) => {
                 value={selectedStatus}
                 labelField="label"
                 valueField="value"
+                selectedTextStyle={{ fontSize: 13, fontWeight: "500" }}
                 onChange={(newStatus) => {
                   handleStatusUpdate(newStatus.label);
                   setSelectedStatus(newStatus);
@@ -97,11 +99,60 @@ const ItemListJob_role = (props) => {
             )}
           </View>
           <View style={{ height: 1, backgroundColor: "#e6e6e6" }}></View>
-          <Text style={{ marginTop: 5, color: "#b0b0b0" }}>
-            Thời gian: {item.started}
-          </Text>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text style={{ marginTop: 5, color: "#b0b0b0" }}>
+              Thời gian: {item.started}
+            </Text>
+            <TouchableOpacity
+              style={{ marginTop: 5 }}
+              onPress={() => setModalVisible(true)}
+            >
+              <Text style={{ color: "#0E55A7" }}>Chi tiết đơn hàng...</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
+
+      {/* Modal chi tiết đơn hàng */}
+      <Modal isVisible={isModalVisible} /* Other modal props go here */>
+        <View style={styles.modalContent}>
+          {item.services.map((service) => (
+            <View key={service._id} style={{flexDirection: 'row'}}>
+              <Image
+                source={{ uri: service.serviceID.image }}
+                style={{ width: 100, height: 100 }}
+              />
+              <View style={{marginStart: 10}}>
+              <Text style={styles.nameService}>{service.serviceID.name}</Text>
+              <Text style={styles.priceService}>{service.serviceID.price}</Text>
+              <Text style={styles.description}>{service.serviceID.description}</Text>
+              </View>
+            </View>
+          ))}
+
+          <Text>{item.client.name}</Text>
+          <Text>{item.client.phone}</Text>
+          <Text>{item.client.gender}</Text>
+
+          {item.staffs.map((staff) => (
+            <View key={staff._id}>
+              <Text>{staff.staffID.name} - {staff.staffID.job}</Text>
+            </View>
+          ))}
+
+          <Text>{item.location}</Text>
+          <Text>{item.note}</Text>
+          <Text>{item.started}</Text>
+          <Text>{item.deadline}</Text>
+          <Text>{item.createdAt}</Text>
+
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text style={{ color: "#0E55A7" }}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -156,6 +207,27 @@ const styles = StyleSheet.create({
     color: "#545454",
   },
   dropdown: {
-    width: 150,
+    width: 130,
+    borderColor: "#8a8a8a",
+    borderWidth: 1.5,
+    borderRadius: 5,
+    padding: 5,
+    height: 30,
+    marginBottom: 10,
   },
+  modalContent:{
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20
+  },
+  description:{
+    color: '#545454'
+  },
+  priceService:{
+    color: "#545454"
+  },
+  nameService:{
+    fontSize: 18,
+    fontWeight: '500'
+  }
 });
