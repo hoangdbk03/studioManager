@@ -85,12 +85,12 @@ const Home = () => {
     } catch (error) {}
   };
   useEffect(() => {
-    // const interval = setInterval(() => {
-    //     fetchDataOrder();
-    // }, 1000);;
+    const interval = setInterval(() => {
+        fetchDataOrder();
+    }, 3000);
     fetchDataOrder();
 
-    // return ()=> clearInterval(interval);
+    return ()=> clearInterval(interval);
   }, []);
 
   // TODO: Thiết lập ngôn ngữ mặc định cho ứng dụng thành tiếng Việt

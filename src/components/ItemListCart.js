@@ -19,17 +19,34 @@ import Modal from "react-native-modal";
 import { styleModal } from "../style/styleModal";
 import { Checkbox } from "react-native-paper";
 import { AppConText } from "../util/AppContext";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import EvilIcons from "react-native-vector-icons/EvilIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Toast from "react-native-toast-message";
 
 const ItemListCart = (props) => {
-  const { item } = props;
+  const { item, staffs } = props;
   const [expanded, setExpanded] = useState(false);
   const [clients, setClients] = useState([]);
   const [dataClient, setDataClient] = useState("");
   const { inforUser } = useContext(AppConText);
 
+  // * 2 trường địa chỉ và ghi chú
+  const [locationValue, setLocationValue] = useState("");
+  const [noteValue, setNoteValue] = useState("");
+
+  // * lưu giá trị của nhân danh sách nhân viên khi mở modal
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+
+  // * lưu thời gian bắt đầu
+  const [startTime, setStartTime] = useState("");
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  // * lưu thời gian hoàn thành
+  const [endTime, setEndTime] = useState("");
+  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
 
   // * hiển thị modal
   const toggleEmployeeModal = () => {
@@ -60,7 +77,7 @@ const ItemListCart = (props) => {
   const fetchClients = async () => {
     try {
       const response = await AxiosIntance().get("/client/list");
-      const clientData = response; // Chỉnh sửa nếu API trả về dữ liệu khác
+      const clientData = response;
       setClients(clientData);
     } catch (error) {
       console.error("Error fetching clients:", error);
@@ -109,6 +126,30 @@ const ItemListCart = (props) => {
     }
   };
 
+  // TODO: Xử lý xác nhận hóa đơn
+  const handleConfirmOder = async () => {
+    try {
+      const orderData = {
+        serviceID: item.serviceID._id,
+        client: dataClient,
+        started: startTime,
+        deadline: endTime,
+        location: locationValue,
+        note: noteValue,
+      }
+      await AxiosIntance().post(`/order/confirmOrder/${inforUser._id}`, orderData);
+      Toast.show({
+        type: "success",
+        text1: "Xác nhận đơn hàng thành công"
+      });
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Xác nhận đơn hàng thất bại"
+      });
+    }
+  };
+
   // TODO: xử lý chọn checkbox
   const handleEmployeeCheckbox = (employeeId) => {
     if (selectedEmployees.includes(employeeId)) {
@@ -138,9 +179,35 @@ const ItemListCart = (props) => {
     fetchEmployees();
   }, []);
 
+  // TODO: xử lý hiển thị và format date thời gian bắt đầu
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+  const handleDateConfirm = (date) => {
+    const fommattedDate_Time = format(date, "HH:mm dd/MM/yyyy");
+    setStartTime(fommattedDate_Time);
+    hideDatePicker();
+  };
+
+  // TODO: xử lý hiển thị và format date thời gian hoàn thành
+  const showEndDatePicker = () => {
+    setEndDatePickerVisibility(true);
+  };
+  const hideEndDatePicker = () => {
+    setEndDatePickerVisibility(false);
+  };
+  const handleEndDateConfirm = (date) => {
+    const formattedEndDate = format(date, "dd/MM/yyyy");
+    setEndTime(formattedEndDate);
+    hideEndDatePicker();
+  };
+
   return (
-    <TouchableOpacity style={styles.container} onPress={toggleExpansion}>
-      <View style={styles.header}>
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.header} onPress={toggleExpansion}>
         <Image style={styles.image} source={{ uri: item.serviceID.image }} />
         <View style={styles.infoService}>
           <Text style={styles.textName}>{item.serviceID.name}</Text>
@@ -149,10 +216,10 @@ const ItemListCart = (props) => {
           </Text>
           <Text>Ngày tạo: {formattedCreated}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
       {expanded && (
         <View style={{ marginTop: 10 }}>
-          <Text>Khách hàng</Text>
+          <Text style={styles.tilte}>Khách hàng</Text>
           <Dropdown
             search
             inputSearchStyle={styles.inputSearchStyle}
@@ -172,12 +239,30 @@ const ItemListCart = (props) => {
             }}
             onChangeText={(value) => setDataClient(value)}
           />
-          <TouchableOpacity
-            style={{ marginTop: 10 }}
-            onPress={toggleEmployeeModal}
-          >
-            <Text>Nhân viên phụ trách</Text>
-          </TouchableOpacity>
+
+          <View>
+            <Text style={styles.tilte}>Nhân viên phụ trách</Text>
+            <TouchableOpacity
+              style={{
+                marginTop: 10,
+                borderWidth: 1,
+                width: 30,
+                alignItems: "center",
+                marginBottom: 5,
+              }}
+              onPress={toggleEmployeeModal}
+            >
+              <MaterialIcons name="add" size={20} />
+            </TouchableOpacity>
+          </View>
+
+          {staffs.map((staff) => (
+            <Text key={staff._id}>
+              {staff.staffID
+                ? `${staff.staffID.name} - ${staff.staffID.job}`
+                : "No staff information"}
+            </Text>
+          ))}
 
           {/* Modal hiển thị danh sách chọn nhân viên */}
           <Modal
@@ -216,41 +301,84 @@ const ItemListCart = (props) => {
           </Modal>
 
           <View style={{ marginTop: 10 }}>
-            <Text>Thời gian bắt đầu</Text>
+            <Text style={styles.tilte}>Thời gian bắt đầu</Text>
+            <View style={{ flexDirection: "row" }}>
+              <EvilIcons name="calendar" size={40} onPress={showDatePicker} />
+              <TextInput
+                placeholder="00:00 dd/MM/yyyy"
+                style={[styles.textinput, { width: "88%" }]}
+                value={startTime}
+                editable={false}
+                mode="outlined"
+                outlineColor="#0E55A7"
+              />
+            </View>
+          </View>
+
+          {/* Lịch chọn giờ và ngày bắt đầu*/}
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="datetime"
+            onConfirm={handleDateConfirm}
+            onCancel={hideDatePicker}
+          />
+
+          {/* Lịch chọn ngày hoàn thành */}
+          <DateTimePickerModal
+            isVisible={isEndDatePickerVisible}
+            mode="date"
+            onConfirm={handleEndDateConfirm}
+            onCancel={hideEndDatePicker}
+          />
+
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.tilte}>Thời gian hoàn thành</Text>
+            <View style={{ flexDirection: "row" }}>
+              <EvilIcons
+                name="calendar"
+                size={40}
+                onPress={showEndDatePicker}
+              />
+              <TextInput
+                placeholder="dd/MM/yyyy"
+                style={[styles.textinput, { width: "88%" }]}
+                editable={false}
+                value={endTime}
+                mode="outlined"
+                outlineColor="#0E55A7"
+              />
+            </View>
+          </View>
+
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.tilte}>Địa chỉ</Text>
             <TextInput
-              placeholder="Nhập thời gian bắt đầu"
-              style={styles.dropdown}
+              mode="outlined"
+              placeholder="Nhập địa chỉ thực hiện"
+              style={styles.textinput}
+              outlineColor="#0E55A7"
+              activeOutlineColor="#0E55A7"
             />
           </View>
 
           <View style={{ marginTop: 10 }}>
-            <Text>Thời gian hoàn thành</Text>
-            <TextInput
-              placeholder="Nhập thời gian hoàn thành"
-              style={styles.dropdown}
-            />
-          </View>
-
-          <View style={{ marginTop: 10 }}>
-            <Text>Địa chỉ</Text>
-            <TextInput placeholder="Nhập địa chỉ" style={styles.dropdown} />
-          </View>
-
-          <View style={{ marginTop: 10 }}>
-            <Text>Ghi chú</Text>
+            <Text style={styles.tilte}>Ghi chú</Text>
             <TextInput
               placeholder="Ghi chú..."
-              style={[styles.dropdown, { height: 100 }]}
+              style={[styles.textinput, { height: 100 }]}
+              mode="outlined"
               multiline={true}
+              outlineColor="#0E55A7"
+              activeOutlineColor="#0E55A7"
             />
           </View>
 
-          <TouchableOpacity style={styles.buttonConfirm}>
+          <TouchableOpacity style={styles.buttonConfirm} onPress={handleConfirmOder}>
             <Text style={{ color: "white", fontWeight: "500" }}>Xác nhận</Text>
           </TouchableOpacity>
         </View>
       )}
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -259,10 +387,12 @@ export default ItemListCart;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e7eef6",
+    backgroundColor: "white",
     padding: 10,
     marginTop: 10,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#0E55A7",
   },
   image: {
     width: 80,
@@ -288,18 +418,22 @@ const styles = StyleSheet.create({
   textName: {
     fontSize: 16,
     fontWeight: "500",
-    height: 25,
+    color: "#062446",
   },
   textPrice: {
-    marginTop: 2,
     color: "#545454",
   },
   dropdown: {
     height: 40,
-    borderColor: "#b4cae4",
+    borderColor: "#0E55A7",
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 5,
     paddingHorizontal: 8,
+    backgroundColor: "#f9f9f9",
+  },
+  textinput: {
+    height: 40,
+    borderRadius: 5,
     backgroundColor: "#f9f9f9",
   },
   inputSearchStyle: {
@@ -322,5 +456,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     borderRadius: 4,
     borderColor: "rgba(0, 0, 0, 0.1)",
+  },
+  tilte: {
+    color: "#062446",
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 2,
   },
 });

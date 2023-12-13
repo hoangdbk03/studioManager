@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 
 const Cart = () => {
   const [data, setData] = useState([]);
+  const [staffs, setStaffs] = useState([]);
   const { inforUser } = useContext(AppConText);
   const navigation = useNavigation();
 
@@ -23,9 +24,12 @@ const Cart = () => {
   const fetchData = async () => {
     try {
       const response = await AxiosIntance().get(`/cart/list/${inforUser._id}`);
-      const apiDataServices = response.services;
-      setData(apiDataServices);
-    } catch (error) {}
+      const apiDataServices = response;
+      setData(apiDataServices.services);
+      setStaffs(apiDataServices.staffs);
+    } catch (error) {
+      
+    }
   };
 
   useEffect(() => {
@@ -56,7 +60,7 @@ const Cart = () => {
           style={{ marginBottom: "21%" }}
           data={data}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ItemListCart item={item} />}
+          renderItem={({ item }) => <ItemListCart item={item} staffs={staffs}/>}
         />
       ) : (
         <View
