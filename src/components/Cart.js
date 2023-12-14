@@ -59,8 +59,8 @@ const Cart = () => {
         <FlatList
           style={{ marginBottom: "21%" }}
           data={data}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ItemListCart key={item._id} item={item} staffs={staffs}/>}
+          keyExtractor={(item) => item.serviceID._id}
+          renderItem={({ item }) => <ItemListCart item={item} staffs={staffs}/>}
         />
       ) : (
         <View

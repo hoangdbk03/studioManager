@@ -3,6 +3,8 @@ import {
   Animated,
   Easing,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -45,7 +47,9 @@ const Login = () => {
       try {
         const storedEmail = await AsyncStorage.getItem("emailUser");
         const storedPassword = await AsyncStorage.getItem("passwordUser");
-        const storedRemember = await AsyncStorage.getItem("rememberCredentials");
+        const storedRemember = await AsyncStorage.getItem(
+          "rememberCredentials"
+        );
 
         if (storedRemember && storedEmail && storedPassword) {
           setemailUser(storedEmail);
@@ -91,7 +95,7 @@ const Login = () => {
         setisLogin(true);
         setinforUser(response);
 
-        // lưu thông tin đăng nhập nếu được chọn 
+        // lưu thông tin đăng nhập nếu được chọn
         if (rememberCredentials) {
           await AsyncStorage.setItem("emailUser", emailUser);
           await AsyncStorage.setItem("passwordUser", passwordUser);
@@ -119,17 +123,29 @@ const Login = () => {
   };
 
   useEffect(() => {
-    Animated.timing(translateY, {
-      toValue: 0,
-      duration: 500,
-      easing: Easing.ease,
-      useNativeDriver: false,
-    }).start();
+    const startAnimation = () => {
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.ease,
+        useNativeDriver: false,
+      }).start();
+    };
+  
+    startAnimation();
+  
+    return () => {
+      translateY.stopAnimation();
+    };
   }, []);
 
   return (
     //hình logo
-    <ScrollView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+    <ScrollView style={styles.ScrollViewContainer}>
       <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
       <Image style={styles.imgFont} source={require("../img/fontBack.png")} />
 
@@ -163,7 +179,7 @@ const Login = () => {
                 style={styles.textInput}
                 label="Mật khẩu"
                 secureTextEntry={!isPasswordVisible}
-                placeholder="*************"
+                placeholder="******"
                 onChangeText={setpasswordUser}
                 value={passwordUser}
               />
@@ -187,17 +203,23 @@ const Login = () => {
 
           {/* checkbox và quên mật khẩu */}
           <View style={styles.checkBox}>
-            <View style={styles.checkBox}>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={styles.checkBox}
+              onPress={() => setRememberCredentials(!rememberCredentials)}
+            >
               <Checkbox
-                status={rememberCredentials  ? "checked" : "unchecked"}
+                status={rememberCredentials ? "checked" : "unchecked"}
                 onPress={() => {
                   setRememberCredentials(!rememberCredentials);
                 }}
                 color="#0E55A7"
                 uncheckedColor="#0E55A7"
               />
-              <Text style={{ color: "#0E55A7", top: 8 }}>Ghi nhớ tài khoản</Text>
-            </View>
+              <Text style={{ color: "#0E55A7", top: 8 }}>
+                Ghi nhớ tài khoản
+              </Text>
+            </TouchableOpacity>
             <Text
               style={{
                 marginLeft: 70,
@@ -223,6 +245,7 @@ const Login = () => {
         </View>
       )}
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -231,6 +254,10 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
+    flex: 1
+  },
+  scrollViewContainer: {
+    flex: 1,
   },
   img: {
     width: "100%",
@@ -283,6 +310,7 @@ const styles = StyleSheet.create({
   textInput: {
     marginStart: 28,
     marginTop: 10,
+    ...(Platform.OS === 'ios' && {marginTop: 15})
   },
   viewLabelEmail: {
     width: 50,

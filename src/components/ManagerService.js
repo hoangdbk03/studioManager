@@ -151,7 +151,7 @@ const ManagerService = () => {
 
       // validate
       if (!dataAdd.name || !dataAdd.imageQuantity || !dataAdd.price) {
-        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!")
+        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
@@ -198,7 +198,7 @@ const ManagerService = () => {
 
       // validate
       if (!dataEdit.name || !dataEdit.imageQuantity || !dataEdit.price) {
-        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!")
+        Alert.alert("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
@@ -300,7 +300,9 @@ const ManagerService = () => {
         name: selectedItem.name || "",
         description: selectedItem.description || "",
         price: selectedItem.price ? selectedItem.price.toString() : "",
-        imageQuantity: selectedItem.imageQuantity ? selectedItem.imageQuantity.toString() : "",
+        imageQuantity: selectedItem.imageQuantity
+          ? selectedItem.imageQuantity.toString()
+          : "",
       });
     }
   }, [selectedItem]);
@@ -452,7 +454,9 @@ const ManagerService = () => {
           <TextInput
             style={styleModal.textInput}
             value={dataEdit.imageQuantity}
-            onChangeText={(text) => setDataEdit({ ...dataEdit, imageQuantity: text })}
+            onChangeText={(text) =>
+              setDataEdit({ ...dataEdit, imageQuantity: text })
+            }
             mode="outlined"
             label="Số lượng ảnh"
             keyboardType="numeric"
@@ -518,21 +522,21 @@ const ManagerService = () => {
               <TextInput
                 style={styleModal.textInput}
                 value={selectedItemForModal.name}
-                disabled={true}
+                editable={false}
                 mode="outlined"
                 label="Tên dịch vụ"
               />
               <TextInput
                 style={styleModal.textInput}
                 value={selectedItemForModal.imageQuantity.toString()}
-                disabled={true}
+                editable={false}
                 mode="outlined"
                 label="Số lượng ảnh"
               />
               <TextInput
                 style={styleModal.textInput}
                 value={formatCurrency(selectedItemForModal.price)}
-                disabled={true}
+                editable={false}
                 mode="outlined"
                 label="Giá tiền"
               />
@@ -542,7 +546,7 @@ const ManagerService = () => {
                   { height: 150, marginBottom: 10 },
                 ]}
                 value={selectedItemForModal.description}
-                disabled={true}
+                editable={false}
                 mode="outlined"
                 label="Mô tả"
                 multiline={true}

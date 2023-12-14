@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -42,7 +49,12 @@ const Users = () => {
       <Stack.Screen
         name="ForgotPassword"
         component={ForgotPassword}
-        options={{ headerShown: true, title: "Gửi lại mật khẩu"}}
+        options={{
+          headerShown: true,
+          title: "Gửi lại mật khẩu",
+          headerBackTitle: "Quay lại",
+          presentation: 'modal'
+        }}
       />
     </Stack.Navigator>
   );
@@ -66,24 +78,29 @@ const Main = () => {
   // TODO: kiểm tra data
   useEffect(() => {
     fetchCartCount();
-    // const interval = setInterval(()=>{
-    //   fetchCartCount();
-    // }, 1000);
-    // return ()=> clearInterval(interval);
+    const interval = setInterval(() => {
+      fetchCartCount();
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
+        tabBarIconStyle: {
+          ...(Platform.OS === "ios" && { top: 12 }),
+        },
         headerShown: false,
         tabBarStyle: {
           display: hideTabBar(route),
           ...styles.shadow,
+          ...(Platform.OS === "ios" && { bottom: 0 }),
         },
         tabBarLabelStyle: {
           bottom: 10,
           fontSize: 12,
+          ...(Platform.OS === "ios" && { top: 18 }),
         },
         tabBarHideOnKeyboard: true,
       })}
@@ -298,7 +315,7 @@ const hideTabBar = (route) => {
     "ManagerService",
     "DetailUser",
     "Statistical",
-    "Salary"
+    "Salary",
   ];
 
   if (screensToHideTabBar.includes(routeName)) {

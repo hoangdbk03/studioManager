@@ -34,13 +34,13 @@ const Client = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
 
 
-  // TODO: 
-  const dateTimeString = selectedData ? selectedData.createdAt : null;
+  // // TODO: 
+  // const dateTimeString = selectedData ?  : null;
 
-  const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
-  const formattedDateTime = dateTime
-    ? format(dateTime, "dd/MM/yyyy HH:mm:ss")
-    : null;
+  // const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
+  // const formattedDateTime = dateTime
+  //   ? format(dateTime, "dd/MM/yyyy HH:mm:ss")
+  //   : null;
 
   //gọi api danh sách khách hàng
   const fetchData = async () => {
@@ -146,6 +146,15 @@ const Client = () => {
                   justifyContent: "space-between",
                 }}
               >
+                <Text style={styles.textModalStyle}>Giới tính: </Text>
+                <Text style={styles.textModalStyle}>{selectedData.gender}</Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Text style={styles.textModalStyle}>Số điện thoại: </Text>
                 <Text style={styles.textModalStyle}>{selectedData.phone}</Text>
               </View>
@@ -178,7 +187,7 @@ const Client = () => {
                 }}
               >
                 <Text style={styles.textModalStyle}>Thời gian tạo: </Text>
-                <Text style={styles.textModalStyle}>{formattedDateTime}</Text>
+                <Text style={styles.textModalStyle}>{selectedData.createdAt}</Text>
               </View>
             </>
           ) : null}

@@ -19,6 +19,7 @@ const ManagerStaff = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const { inforUser } = useContext(AppConText);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
@@ -32,7 +33,7 @@ const ManagerStaff = ({ route, navigation }) => {
     try {
       const response = await AxiosIntance().get("/user/list");
       const apiData = response;
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       apiData.sort((a, b) => {
         if (a.role === "Quản lý" && b.role !== "Quản lý") return -1;
@@ -41,40 +42,38 @@ const ManagerStaff = ({ route, navigation }) => {
       });
 
       setdata(apiData);
+      setRefreshing(false);
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Lấy danh sách thất bại",
       });
+      setRefreshing(false);
     } finally {
       setLoading(false);
     }
   };
 
   // alert xác nhận xóa
-  const alertConfirm = (itemId)=>{
-    Alert.alert(
-      "Xác nhận xóa",
-      "Bạn chắc chắn muốn xóa?",
-      [
-        {
-          text: "Hủy",
-          style: "cancel"
+  const alertConfirm = (itemId) => {
+    Alert.alert("Xác nhận xóa", "Bạn chắc chắn muốn xóa?", [
+      {
+        text: "Hủy",
+        style: "cancel",
+      },
+      {
+        text: "Xóa",
+        onPress: () => {
+          handleDelete(itemId);
         },
-        {
-          text: "Xóa",
-          onPress: () =>{
-            handleDelete(itemId);
-          }
-        }
-      ]
-    )
-  }
+      },
+    ]);
+  };
 
   // gọi api xử lý xóa theo id
-  const handleDelete = async(itemId) => {
+  const handleDelete = async (itemId) => {
     try {
-      await AxiosIntance().delete("/user/delete/"+itemId);
+      await AxiosIntance().delete("/user/delete/" + itemId);
       Toast.show({
         type: "success",
         text1: "Xóa thành công",
@@ -86,7 +85,7 @@ const ManagerStaff = ({ route, navigation }) => {
         text1: "Xóa thất bại",
       });
     }
-  }
+  };
 
   useEffect(() => {
     if (route.params?.refresh) {
@@ -97,13 +96,22 @@ const ManagerStaff = ({ route, navigation }) => {
     }
   }, [route.params?.refresh]);
 
-
   // lọc theo tên data
   const filteredData = data.filter(
     (item) =>
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // load lại data
+  const handleRefreshData = () => {
+    setRefreshing(true);
+    fetchData();
+    Toast.show({
+      type: "success",
+      text1: "Cập nhật thành công",
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -124,22 +132,19 @@ const ManagerStaff = ({ route, navigation }) => {
         <FlatList
           data={filteredData ?? listPlaceholder}
           keyExtractor={(item) => item._id}
+          refreshing={refreshing}
+          onRefresh={handleRefreshData}
           renderItem={({ item }) => {
             if (
               inforUser.role === "Admin" &&
               (item.role === "Quản lý" || item.role === "Nhân viên")
             ) {
-              return <ItemListStaff item={item} onDelete={alertConfirm}/>;
+              return <ItemListStaff item={item} onDelete={alertConfirm} />;
             } else if (
               inforUser.role === "Quản lý" &&
               item.role === "Nhân viên"
             ) {
-              return (
-                <ItemListStaff
-                  item={item}
-                  onDelete={alertConfirm}
-                />
-              );
+              return <ItemListStaff item={item} onDelete={alertConfirm} />;
             }
           }}
         />

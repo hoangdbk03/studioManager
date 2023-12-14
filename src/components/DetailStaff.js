@@ -1,4 +1,10 @@
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { Avatar } from "react-native-paper";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -9,6 +15,7 @@ import { TouchableOpacity } from "@gorhom/bottom-sheet";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { format, parseISO } from "date-fns";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const genderOptions = [
   { label: "Nam", value: "1" },
@@ -22,14 +29,12 @@ const roleOptions = [
 ];
 
 const jobOptions = [
-  { label: "Trống", value: "1" },
-  { label: "Photographer", value: "2" },
-  { label: "Trợ lý Photographer", value: "3" },
-  { label: "Makeup", value: "4" },
-  { label: "Hậu kỳ", value: "5" },
-  { label: "Editor", value: "6" },
-  { label: "Kỹ thuật", value: "7" },
-  { label: "Tài xế", value: "8" },
+  { label: "Nhiếp Ảnh Gia(Photographer)", value: "1" },
+  { label: "Trợ lý Photographer", value: "2" },
+  { label: "Make-up và Trang Phục", value: "3" },
+  { label: "Hậu kỳ", value: "4" },
+  { label: "Chỉnh sửa ảnh(Editor)", value: "5" },
+  { label: "Kỹ thuật", value: "6" },
 ];
 
 const DetailStaff = ({ route }) => {
@@ -47,6 +52,19 @@ const DetailStaff = ({ route }) => {
     item.citizenIdentityCard
   );
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(item.birthday);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const handleDateConfirm = (date) => {
+    setSelectedDate(format(date, "dd/MM/yyyy"));
+    setDatePickerVisibility(false);
+  };
+
+  // TODO: xử lý api update người dùng
   const handleUpdate = async () => {
     try {
       setLoading(true);
@@ -57,7 +75,7 @@ const DetailStaff = ({ route }) => {
       const dataUpdate = {
         name: nameUser,
         gender: getLabelFromOptions(genderOptions, selectedGender),
-        birthday,
+        birthday: selectedDate,
         email,
         phone,
         citizenIdentityCard,
@@ -65,28 +83,38 @@ const DetailStaff = ({ route }) => {
         job: getLabelFromOptions(jobOptions, job),
       };
 
-      // kiểm tra nếu trống sẽ delete không cho trường đó cập nhật
-      if (!selectedGender) delete payload.gender;
-      if (!role) delete payload.role;
-      if (!job) delete payload.job;
-      await AxiosIntance().put(`/user/update/${item._id}`, dataUpdate);
-      Toast.show({
-        type: "success",
-        text1: "Lưu thành công",
+      // Remove fields with empty values or unchanged values
+      Object.keys(dataUpdate).forEach((key) => {
+        if (dataUpdate[key] === '' || dataUpdate[key] === item[key]) {
+          delete dataUpdate[key];
+        }
       });
-      navigation.navigate("ManagerStaff", { refresh: true });
+
+      // Update only if there are changes
+      if (Object.keys(dataUpdate).length > 0) {
+        await AxiosIntance().put(`/user/update/${item._id}`, dataUpdate);
+        Toast.show({
+          type: "success",
+          text1: "Lưu thành công",
+        });
+        navigation.navigate("ManagerStaff", { refresh: true });
+      } else {
+        Toast.show({
+          type: "info",
+          text1: "Không có thông tin nào được chỉnh sửa",
+        });
+      }
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Lưu thất bại",
       });
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
 
   const styleInput = {
-
     activeOutlineColor: "#0E55A7",
     outlineColor: "#8a8a8a",
     outlineStyle: { borderRadius: 10, borderWidth: 1.5 },
@@ -119,19 +147,28 @@ const DetailStaff = ({ route }) => {
             <TextInput
               style={styles.inputBirthday}
               mode="outlined"
-              value={birthday}
+              value={selectedDate}
               label="Năm sinh"
               {...styleInput}
-              onChangeText={(text) => setBirthday(text)}
+              onTouchStart={showDatePicker}
             />
-             <Dropdown
-              style={[styles.dropdown, { width: "30%", marginTop: 5 }]}
+
+            {/* Show lịch */}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleDateConfirm}
+              onCancel={() => setDatePickerVisibility(false)}
+            />
+            
+            <Dropdown
+              style={[styles.dropdown, { width: "33%", marginTop: 5 }]}
               data={roleOptions}
               value={role}
               maxHeight={300}
               labelField="label"
               valueField="value"
-              containerStyle={{borderRadius: 10}}
+              containerStyle={{ borderRadius: 10 }}
               placeholder={role ? item.role : "Vai trò"}
               onChange={(item) => {
                 setRole(item.value);
@@ -139,13 +176,13 @@ const DetailStaff = ({ route }) => {
               onChangeText={(value) => setRole(value)}
             />
             <Dropdown
-              style={[styles.dropdown, { width: "30%",  marginTop: 5  }]}
+              style={[styles.dropdown, { width: "30%", marginTop: 5 }]}
               data={genderOptions}
               value={selectedGender}
               maxHeight={300}
               labelField="label"
               valueField="value"
-              containerStyle={{borderRadius: 10}}
+              containerStyle={{ borderRadius: 10 }}
               placeholder={selectedGender ? item.gender : "Giới tính"}
               onChange={(item) => {
                 setSelectedGender(item.value);
@@ -170,20 +207,20 @@ const DetailStaff = ({ route }) => {
             {...styleInput}
             onChangeText={(text) => setPhone(text)}
           />
-            <Dropdown
-              style={[styles.dropdown, { width: "90%",  marginTop: 10 }]}
-              data={jobOptions}
-              value={job}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              containerStyle={{borderRadius: 10}}
-              placeholder={job ? item.job : "Công việc"}
-              onChange={(item) => {
-                setJob(item.value);
-              }}
-              onChangeText={(value) => setJob(value)}
-            />
+          <Dropdown
+            style={[styles.dropdown, { width: "90%", marginTop: 10 }]}
+            data={jobOptions}
+            value={job}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            containerStyle={{ borderRadius: 10 }}
+            placeholder={job ? item.job : "Công việc"}
+            onChange={(item) => {
+              setJob(item.value);
+            }}
+            onChangeText={(value) => setJob(value)}
+          />
           <TextInput
             style={[styles.input, styles.inputRemaining]}
             mode="outlined"
@@ -209,14 +246,16 @@ const DetailStaff = ({ route }) => {
             disabled
           />
           <TouchableOpacity style={styles.buttonSave} onPress={handleUpdate}>
-            <Text style={{color: 'white', fontSize: 15, fontWeight: '500'}}>Lưu</Text>
+            <Text style={{ color: "white", fontSize: 15, fontWeight: "500" }}>
+              Lưu
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
       {loading && (
         <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0E55A7" />
-      </View>
+          <ActivityIndicator size="large" color="#0E55A7" />
+        </View>
       )}
     </View>
   );
@@ -245,7 +284,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   inputBirthday: {
-    width: '35%',
+    width: "35%",
     height: 50,
     backgroundColor: "#f9f9f9",
   },
@@ -262,7 +301,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderRadius: 12,
     paddingHorizontal: 8,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   birthday_gender: {
     width: "90%",
@@ -273,12 +312,12 @@ const styles = StyleSheet.create({
   },
   buttonSave: {
     backgroundColor: "#0E55A7",
-    width: 150,
+    width: 340,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    marginTop: 10
+    marginTop: 10,
   },
   scrollView: {
     width: "100%",

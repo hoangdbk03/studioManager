@@ -275,6 +275,7 @@ const Profile = ({ route }) => {
             <TextInput
               mode="outlined"
               label="Mật khẩu cũ"
+              secureTextEntry
               onChangeText={(text) =>
                 setdataUser({ ...dataUser, oldpassword: text })
               }

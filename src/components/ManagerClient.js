@@ -15,7 +15,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { AppConText } from "../util/AppContext";
 import { styleModal } from "../style/styleModal";
 import ItemListClientAdmin from "./ItemListClientAdmin";
+import { Searchbar } from "react-native-paper";
 import { Dropdown } from "react-native-element-dropdown";
+import unorm from "unorm";
 
 const genderOptions = [
   { label: "Nam", value: "1" },
@@ -29,6 +31,23 @@ const ManagerClient = () => {
   const [data, setdata] = useState([]);
   const { inforUser } = useContext(AppConText);
   const [selectedGender, setSelectedGender] = useState("");
+  const [refreshing, setrefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const onChangeSearch = (query) => setSearchQuery(query);
+  // Chuẩn hóa chuỗi sang Unicode NFD
+  const normalizedSearchQuery = unorm.nfkd(searchQuery.toLowerCase());
+
+  // Lọc dữ liệu dựa trên chuỗi tìm kiếm đã được chuẩn hóa
+  const filteredData = data.filter((item) => {
+    const normalizedDataName = unorm.nfkd(item.name.toLowerCase());
+    const normalizedDataPhone = unorm.nfkd(item.phone.toLowerCase());
+
+    return (
+      normalizedDataName.includes(normalizedSearchQuery) ||
+      normalizedDataPhone.includes(normalizedSearchQuery)
+    );
+  });
 
   //lưu giá trị được thêm
   const [addData, setaddData] = useState({
@@ -45,6 +64,11 @@ const ManagerClient = () => {
     phone: "",
   });
 
+  // xử lý tìm kiếm
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
+
   //ẩn modal
   const toggleAddModal = () => {
     setAddModalVisible(!isAddModalVisible);
@@ -60,12 +84,23 @@ const ManagerClient = () => {
       const response = await AxiosIntance().get("/client/list/");
       const apiData = response;
       setdata(apiData);
+      setrefreshing(false);
     } catch (error) {
       Toast.show({
         type: "error",
         text1: "Đã xảy ra lỗi",
       });
+      setrefreshing(false);
     }
+  };
+  // load lại data
+  const handleRefreshData = () => {
+    setrefreshing(true);
+    fetchData();
+    Toast.show({
+      type: "success",
+      text1: "Cập nhật thành công",
+    });
   };
 
   // xử lý thêm dữ liệu
@@ -152,8 +187,29 @@ const ManagerClient = () => {
   //phần front-end
   return (
     <View style={styles.container}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: 10,
+        }}
+      >
+        <Searchbar
+          placeholder="Tìm kiếm"
+          onChangeText={onChangeSearch}
+          value={searchQuery}
+          style={{ borderRadius: 10, width: "82%" }}
+        />
+        {/* Floating button */}
+        <TouchableOpacity style={styles.fab} onPress={toggleAddModal}>
+          <MaterialIcons name="add" size={30} color="white" />
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={data}
+        data={filteredData}
+        refreshing={refreshing}
+        onRefresh={handleRefreshData}
         keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => (
           <TouchableOpacity
@@ -171,11 +227,6 @@ const ManagerClient = () => {
           </TouchableOpacity>
         )}
       />
-
-      {/* Floating button */}
-      <TouchableOpacity style={styles.fab} onPress={toggleAddModal}>
-        <MaterialIcons name="add" size={30} color="white" />
-      </TouchableOpacity>
 
       {/* Modal thêm thông tin khách hàng mới */}
       <Modal isVisible={isAddModalVisible} style={styleModal.modalContainer}>
@@ -322,15 +373,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   fab: {
-    position: "absolute",
     width: 56,
     height: 56,
     alignItems: "center",
     justifyContent: "center",
-    left: 40,
-    bottom: 60,
     backgroundColor: "#0E55A7",
-    borderRadius: 30,
+    borderRadius: 10,
     elevation: 8,
   },
   dropdown: {

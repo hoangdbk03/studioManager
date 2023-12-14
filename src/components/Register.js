@@ -19,13 +19,12 @@ const dataRole = [
 ];
 
 const dataWork = [
-  { label: "Photographer", value: "1" },
+  { label: "Nhiếp Ảnh Gia(Photographer)", value: "1" },
   { label: "Trợ lý Photographer", value: "2" },
-  { label: "Makeup", value: "3" },
+  { label: "Make-up và Trang Phục", value: "3" },
   { label: "Hậu kỳ", value: "4" },
-  { label: "Editor", value: "5" },
+  { label: "Chỉnh sửa ảnh(Editor)", value: "5" },
   { label: "Kỹ thuật", value: "6" },
-  { label: "Tài xế", value: "7" },
 ];
 
 const Register = () => {

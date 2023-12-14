@@ -84,12 +84,30 @@ const ItemListJob_role = (props) => {
               <Text style={{ marginTop: 5 }}>{item.status}</Text>
             ) : (
               <Dropdown
-                style={styles.dropdown}
+                style={[
+                  styles.dropdown,
+                  {
+                    borderColor:
+                      item.status === "Hoàn thành" || item.status === "Đã hủy"
+                        ? "#e6e6e6"
+                        : "#8a8a8a",
+                  },
+                ]}
                 data={statusOptions}
                 value={selectedStatus}
+                disable={
+                  item.status === "Hoàn thành" || item.status === "Đã hủy"
+                }
                 labelField="label"
                 valueField="value"
-                selectedTextStyle={{ fontSize: 13, fontWeight: "500" }}
+                selectedTextStyle={{
+                  fontSize: 13,
+                  fontWeight: "500",
+                  color:
+                    item.status === "Hoàn thành" || item.status === "Đã hủy"
+                      ? "#b0b0b0"
+                      : "black",
+                }}
                 onChange={(newStatus) => {
                   handleStatusUpdate(newStatus.label);
                   setSelectedStatus(newStatus);
@@ -109,7 +127,7 @@ const ItemListJob_role = (props) => {
               style={{ marginTop: 5 }}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={{ color: "#0E55A7" }}>Chi tiết đơn hàng...</Text>
+              <Text style={{ color: "#0E55A7", fontWeight: 'bold' }}>Chi tiết...</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -119,15 +137,19 @@ const ItemListJob_role = (props) => {
       <Modal isVisible={isModalVisible} /* Other modal props go here */>
         <View style={styles.modalContent}>
           {item.services.map((service) => (
-            <View key={service._id} style={{flexDirection: 'row'}}>
+            <View key={service._id} style={{ flexDirection: "row" }}>
               <Image
                 source={{ uri: service.serviceID.image }}
                 style={{ width: 100, height: 100 }}
               />
-              <View style={{marginStart: 10}}>
-              <Text style={styles.nameService}>{service.serviceID.name}</Text>
-              <Text style={styles.priceService}>{service.serviceID.price}</Text>
-              <Text style={styles.description}>{service.serviceID.description}</Text>
+              <View style={{ marginStart: 10 }}>
+                <Text style={styles.nameService}>{service.serviceID.name}</Text>
+                <Text style={styles.priceService}>
+                  {service.serviceID.price}
+                </Text>
+                <Text style={styles.description}>
+                  {service.serviceID.description}
+                </Text>
               </View>
             </View>
           ))}
@@ -138,7 +160,9 @@ const ItemListJob_role = (props) => {
 
           {item.staffs.map((staff) => (
             <View key={staff._id}>
-              <Text>{staff.staffID.name} - {staff.staffID.job}</Text>
+              <Text>
+                {staff.staffID.name} - {staff.staffID.job}
+              </Text>
             </View>
           ))}
 
@@ -207,27 +231,26 @@ const styles = StyleSheet.create({
     color: "#545454",
   },
   dropdown: {
-    width: 130,
-    borderColor: "#8a8a8a",
+    width: 150,
     borderWidth: 1.5,
     borderRadius: 5,
     padding: 5,
     height: 30,
     marginBottom: 10,
   },
-  modalContent:{
-    backgroundColor: 'white',
+  modalContent: {
+    backgroundColor: "white",
     borderRadius: 10,
-    padding: 20
+    padding: 20,
   },
-  description:{
-    color: '#545454'
+  description: {
+    color: "#545454",
   },
-  priceService:{
-    color: "#545454"
+  priceService: {
+    color: "#545454",
   },
-  nameService:{
+  nameService: {
     fontSize: 18,
-    fontWeight: '500'
-  }
+    fontWeight: "500",
+  },
 });

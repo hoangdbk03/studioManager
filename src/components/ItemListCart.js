@@ -25,7 +25,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Toast from "react-native-toast-message";
 
 const ItemListCart = (props) => {
-  const { item, staffs, key } = props;
+  const { item, staffs } = props;
   const [expanded, setExpanded] = useState(false);
   const [clients, setClients] = useState([]);
   const [dataClient, setDataClient] = useState("");
@@ -101,9 +101,7 @@ const ItemListCart = (props) => {
         serviceID: serviceId,
         staffID: staffId,
       });
-      console.log("Thêm nv vào cart thành công");
     } catch (error) {
-      console.error("Lỗi khi thêm nhân viên vào giỏ hàng:", error);
       Alert.alert("Đã xảy ra lỗi khi thêm nhân viên vào giỏ hàng!");
     }
   };
@@ -123,7 +121,6 @@ const ItemListCart = (props) => {
           },
         }
       );
-      console.log("Xóa nv khỏi cart thành công");
     } catch (error) {
       Alert.alert(
         "Thông báo",
@@ -242,7 +239,7 @@ const ItemListCart = (props) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} key={item.id}>
       <TouchableOpacity
         style={styles.header}
         onPress={toggleExpansion}
@@ -296,13 +293,13 @@ const ItemListCart = (props) => {
             </TouchableOpacity>
           </View>
 
-          {staffs.map((staff) => (
+          {/* {staffs.map((staff) => (
             <Text key={staff._id}>
               {staff.staffID
                 ? `${staff.staffID.name} - ${staff.staffID.job}`
                 : "No staff information"}
             </Text>
-          ))}
+          ))} */}
 
           {/* Modal hiển thị danh sách chọn nhân viên */}
           <Modal
@@ -311,22 +308,24 @@ const ItemListCart = (props) => {
             style={styles.modalContainer}
           >
             <View style={styles.modalContent}>
-              {employees.map(
-                (employee) =>
-                  employee.role === "Nhân viên" && (
-                    <View key={employee._id} style={styles.employeeItem}>
-                      <Checkbox
-                        status={
-                          selectedEmployees.includes(employee._id)
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        onPress={() => handleEmployeeCheckbox(employee._id)}
-                      />
-                      <Text>{`${employee.name} - ${employee.job}`}</Text>
-                    </View>
-                  )
-              )}
+              <ScrollView>
+                {employees.map(
+                  (employee) =>
+                    employee.role === "Nhân viên" && (
+                      <View key={employee._id} style={styles.employeeItem}>
+                        <Checkbox
+                          status={
+                            selectedEmployees.includes(employee._id)
+                              ? "checked"
+                              : "unchecked"
+                          }
+                          onPress={() => handleEmployeeCheckbox(employee._id)}
+                        />
+                        <Text>{`${employee.name} - ${employee.job}`}</Text>
+                      </View>
+                    )
+                )}
+              </ScrollView>
 
               <TouchableOpacity
                 style={styles.buttonConfirm}
@@ -399,6 +398,8 @@ const ItemListCart = (props) => {
               style={styles.textinput}
               outlineColor="#0E55A7"
               activeOutlineColor="#0E55A7"
+              value={locationValue}
+              onChangeText={(text) => setLocationValue(text)}
             />
           </View>
 
@@ -411,6 +412,8 @@ const ItemListCart = (props) => {
               multiline={true}
               outlineColor="#0E55A7"
               activeOutlineColor="#0E55A7"
+              value={noteValue}
+              onChangeText={(text) => setNoteValue(text)}
             />
           </View>
 
@@ -452,9 +455,11 @@ const ItemListCart = (props) => {
             );
           }}
         >
-          <View style={{flexDirection: 'row'}}>
-          <Text style={{color: '#fc6261', fontWeight: 'bold'}}>Xóa dịch vụ</Text>
-          <Text> - {item.serviceID.name}</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={{ color: "#fc6261", fontWeight: "bold" }}>
+              Xóa dịch vụ
+            </Text>
+            <Text> - {item.serviceID.name}</Text>
           </View>
         </TouchableOpacity>
       </Modal>
