@@ -239,7 +239,7 @@ const ItemListCart = (props) => {
   };
 
   return (
-    <View style={styles.container} key={item.id}>
+    <View style={styles.container}>
       <TouchableOpacity
         style={styles.header}
         onPress={toggleExpansion}
@@ -293,13 +293,15 @@ const ItemListCart = (props) => {
             </TouchableOpacity>
           </View>
 
-          {/* {staffs.map((staff) => (
-            <Text key={staff._id}>
-              {staff.staffID
-                ? `${staff.staffID.name} - ${staff.staffID.job}`
-                : "No staff information"}
-            </Text>
-          ))} */}
+          {staffs
+            .filter((staff) => staff.serviceID === item.serviceID._id)
+            .map((staff) => (
+              <Text key={staff.staffID._id}>
+                {staff.staffID
+                  ? `${staff.staffID.name} - ${staff.staffID.job}`
+                  : "No staff information"}
+              </Text>
+            ))}
 
           {/* Modal hiển thị danh sách chọn nhân viên */}
           <Modal
@@ -421,7 +423,9 @@ const ItemListCart = (props) => {
             style={styles.buttonConfirm}
             onPress={handleConfirmOder}
           >
-            <Text style={{ color: "white", fontWeight: "500" }}>Xác nhận</Text>
+            <Text style={{ color: "white", fontWeight: "500" }}>
+              Xác nhận đơn hàng
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -541,6 +545,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     borderRadius: 4,
     borderColor: "rgba(0, 0, 0, 0.1)",
+    height: "50%",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   tilte: {
     color: "#062446",

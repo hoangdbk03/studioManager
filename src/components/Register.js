@@ -74,7 +74,7 @@ const Register = () => {
     } else if (!isNameValid(nameUser)) {
       errorMessage = "Họ tên không được nhập số!";
     } else if (!isCccdValid(cccdUser)) {
-      errorMessage = "CMT/CCCD không chính sác!";
+      errorMessage = "CMT/CCCD không chính xác!";
     } else if (!setroleValue) {
       errorMessage = "Họ tên không được nhập số";
     }
