@@ -267,7 +267,8 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: "#0E55A7",
     marginTop: 5,
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
   inputEmail: {
     width: 320,
