@@ -6,6 +6,7 @@ import AxiosIntance from "../util/AxiosIntance";
 import { AppConText } from "../util/AppContext";
 import Modal from "react-native-modal";
 import { styleModal } from "../style/styleModal";
+import Toast from "react-native-toast-message";
 
 const ItemListJob_role = (props) => {
   const { item } = props;
@@ -34,7 +35,12 @@ const ItemListJob_role = (props) => {
 
       if (response.status === 200) {
         setSelectedStatus(newStatus);
+        props.loadData();
       }
+      Toast.show({
+        type: "success",
+        text1: "Cập nhật trạng thái thành công",
+      });
     } catch (error) {
       console.log("hi", newStatus);
       console.error("Error updating status:", error);

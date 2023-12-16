@@ -33,8 +33,7 @@ const Client = () => {
   // * xử lý tìm kiếm
   const [searchQuery, setSearchQuery] = React.useState("");
 
-
-  // // TODO: 
+  // // TODO:
   // const dateTimeString = selectedData ?  : null;
 
   // const dateTime = dateTimeString ? parseISO(dateTimeString) : null;
@@ -56,7 +55,7 @@ const Client = () => {
   };
 
   useEffect(() => {
-      fetchData();
+    fetchData();
   }, []);
 
   //xử lý load lại data
@@ -103,6 +102,8 @@ const Client = () => {
       <FlatList
         style={{ marginBottom: "21%" }}
         refreshing={refreshing}
+        initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+        onEndReached={fetchData}
         onRefresh={handleRefreshData}
         data={filteredData}
         keyExtractor={(item) => item._id}
@@ -187,7 +188,9 @@ const Client = () => {
                 }}
               >
                 <Text style={styles.textModalStyle}>Thời gian tạo: </Text>
-                <Text style={styles.textModalStyle}>{selectedData.createdAt}</Text>
+                <Text style={styles.textModalStyle}>
+                  {selectedData.createdAt}
+                </Text>
               </View>
             </>
           ) : null}

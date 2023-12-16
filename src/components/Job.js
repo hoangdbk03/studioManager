@@ -12,6 +12,7 @@ const Job = () => {
   const [dataListOrder, setDataListOrder] = useState([]);
   const { inforUser } = useContext(AppConText);
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setrefreshing] = useState(false);
 
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -31,7 +32,7 @@ const Job = () => {
   const handleDateConfirm = (date) => {
     hideDatePicker();
     // Format the selected date as dd/MM/yyyy
-    const formattedDate = format(date, 'dd/MM/yyyy');
+    const formattedDate = format(date, "dd/MM/yyyy");
     // Set the selected date to the Searchbar
     setSearchQuery(formattedDate);
     setSelectedDate(date);
@@ -66,19 +67,22 @@ const Job = () => {
           : apiData;
 
       setDataListOrder(filteredData);
+      setrefreshing(false);
     } catch (error) {
       // Handle error
       console.error("Error fetching data:", error);
+      setrefreshing(false);
     }
   };
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchDataOrder();
-    }, 3000);
     fetchDataOrder();
+  }, [dataListOrder]);
 
-    return () => clearInterval(interval);
-  }, []);
+  // load lại data
+  const handleRefreshData = () => {
+    setrefreshing(true);
+    fetchDataOrder();
+  };
 
   return (
     <View style={styles.container}>
@@ -105,10 +109,16 @@ const Job = () => {
 
       {filterData(dataListOrder).length > 0 ? (
         <FlatList
+          refreshing={refreshing}
+          onRefresh={handleRefreshData}
+          initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+          onEndReached={fetchDataOrder}
           style={{ marginBottom: "21%" }}
           data={filterData(dataListOrder)}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ItemListJob_role item={item} />}
+          renderItem={({ item }) => (
+            <ItemListJob_role item={item} loadData={fetchDataOrder} />
+          )}
         />
       ) : (
         <View

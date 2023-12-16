@@ -58,6 +58,8 @@ const Cart = () => {
       {data.length > 0 ? (
         <FlatList
           style={{ marginBottom: "21%" }}
+          initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+          onEndReached={fetchData}
           data={data}
           keyExtractor={(item) => item.serviceID._id}
           renderItem={({ item }) => <ItemListCart item={item} staffs={staffs}/>}

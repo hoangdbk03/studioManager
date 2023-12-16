@@ -20,6 +20,7 @@ import Modal from "react-native-modal";
 import { TextInput } from "react-native-paper";
 import { styleModal } from "../style/styleModal";
 import { useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = ({ route }) => {
   const navigation = useNavigation();
@@ -64,6 +65,9 @@ const Profile = ({ route }) => {
           text1: "ĐĂNG XUẤT THÀNH CÔNG",
         });
         setisLogin(false);
+        await AsyncStorage.removeItem("emailUser");
+        await AsyncStorage.removeItem("passwordUser");
+        await AsyncStorage.removeItem("rememberCredentials");
       }
     } catch (error) {
       Toast.show({

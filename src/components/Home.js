@@ -172,6 +172,8 @@ const Home = () => {
       {dataListOrder.length > 0 ? (
         <FlatList
           style={styles.body_list}
+          initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+          onEndReached={fetchDataOrder}
           data={dataListOrder.filter(
             (item) =>
               selectedStatus === "Tất cả" || item.status === selectedStatus

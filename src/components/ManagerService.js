@@ -317,6 +317,8 @@ const ManagerService = () => {
       <FlatList
         data={data}
         numColumns={numColumns}
+        initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+        onEndReached={fetchData}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <ItemListService
