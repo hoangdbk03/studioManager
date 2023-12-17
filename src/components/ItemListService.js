@@ -28,7 +28,7 @@ const ItemListService = (props) => {
       style: "currency",
       currency: "VND",
     }).format(price);
-    return formattedPrice.replace(/\s₫/g, "");
+    return formattedPrice.replace(/\s₫/, "");
   };
 
   const idAddCart = {

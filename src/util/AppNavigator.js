@@ -41,7 +41,7 @@ const Stack = createStackNavigator();
 const Users = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName="Splash"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
@@ -340,18 +340,9 @@ const styles = StyleSheet.create({
     bottom: 15,
     left: 10,
     right: 10,
-    elevation: 0,
     borderRadius: 15,
-    height: 70,
-    shadowColor: "#0E55A7",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.32,
-    shadowRadius: 5.46,
-
-    elevation: 5,
+    height: Platform.OS === 'ios' ? 73 : 70,
+    
   },
   tabIcon: {
     justifyContent: "center",

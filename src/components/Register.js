@@ -77,7 +77,7 @@ const Register = () => {
     } else if (!isCccdValid(cccdUser)) {
       errorMessage = "CMT/CCCD không chính xác!";
     } else if (!setroleValue) {
-      errorMessage = "Họ tên không được nhập số";
+      errorMessage = "Vui lòng chọn ví trí công việc";
     }
 
     if (errorMessage) {
@@ -108,7 +108,6 @@ const Register = () => {
         "/user/register",
         dataRegister
       );
-
       if (response) {
         Toast.show({
           type: "success",
@@ -127,16 +126,11 @@ const Register = () => {
 
         // focus về ô nhập email
         emailRef.current.focus();
-      } else {
-        Toast.show({
-          type: "error",
-          text1: response.message,
-        });
       }
     } catch (error) {
       Toast.show({
         type: "error",
-        text1: response.message,
+        text1: "Email đã tồn tại!",
       });
     }
   };
@@ -144,107 +138,111 @@ const Register = () => {
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={require("../img/backgroundSpl.jpg")} />
+      <View style={styles.bar} />
 
-      <ScrollView>
-        <View style={styles.bar} />
-        <View>
-          <View style={styles.inputEmail}>
-            <TextInput
-              ref={emailRef}
-              style={styles.textInput}
-              placeholder="example@gmail.com"
-              underlineColor="red"
-              onChangeText={setemailUser}
-            />
+      <ScrollView style={{ width: "100%" }}>
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <View>
+            <View style={styles.inputEmail}>
+              <TextInput
+                ref={emailRef}
+                style={styles.textInput}
+                placeholder="example@gmail.com"
+                underlineColor="red"
+                onChangeText={setemailUser}
+              />
+            </View>
+            <View style={styles.viewLabelEmail}>
+              <Text Text style={styles.label}>
+                Email
+              </Text>
+            </View>
           </View>
-          <View style={styles.viewLabelEmail}>
-            <Text Text style={styles.label}>
-              Email
-            </Text>
+          <View>
+            <View style={styles.inputName}>
+              <TextInput
+                ref={nameRef}
+                style={styles.textInput}
+                placeholder="Nguyễn Văn A"
+                onChangeText={setnameUser}
+              />
+            </View>
+            <View style={styles.viewLabelName}>
+              <Text Text style={styles.label}>
+                Họ và tên
+              </Text>
+            </View>
           </View>
-        </View>
-        <View>
-          <View style={styles.inputName}>
-            <TextInput
-              ref={nameRef}
-              style={styles.textInput}
-              placeholder="Nguyễn Văn A"
-              onChangeText={setnameUser}
-            />
+          <View>
+            <View style={styles.inputName}>
+              <TextInput
+                ref={cccdRef}
+                style={styles.textInput}
+                placeholder="Nhập số CMT/CCCD"
+                onChangeText={setCccdUser}
+                keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+                maxLength={12}
+              />
+            </View>
+            <View style={styles.viewLabelCccd}>
+              <Text Text style={styles.label}>
+                CMT/CCCD
+              </Text>
+            </View>
           </View>
-          <View style={styles.viewLabelName}>
-            <Text Text style={styles.label}>
-              Họ và tên
-            </Text>
-          </View>
-        </View>
-        <View>
-          <View style={styles.inputName}>
-            <TextInput
-              ref={cccdRef}
-              style={styles.textInput}
-              placeholder="Nhập số CMT/CCCD"
-              onChangeText={setCccdUser}
-              keyboardType="numeric"
-              maxLength={12}
-            />
-          </View>
-          <View style={styles.viewLabelCccd}>
-            <Text Text style={styles.label}>
-              CMT/CCCD
-            </Text>
-          </View>
-        </View>
-
-        {/* chọn ban nhân sự => quản lý or nhân viên */}
-        <Dropdown
-          style={[styles.dropdown, { borderColor: "#0E55A7" }]}
-          data={dataRole}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Vị trí công việc"
-          value={roleValue}
-          onChange={(item) => {
-            setroleValue(item.value);
-            setisJobVisible(item.value === "2");
-          }}
-          onChangeText={setroleUser}
-          renderLeftIcon={() => (
-            <Icon style={styles.icon} name="add-moderator" size={20} />
-          )}
-        />
-
-        {/* vai trò công việc*/}
-
-        {isJobVisible && (
+          {/* chọn ban nhân sự => quản lý or nhân viên */}
           <Dropdown
-            style={[styles.dropdown, { borderColor: "#0E55A7", marginTop: 30 }]}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={dataWork}
-            search
+            style={[styles.dropdown, { borderColor: "#0E55A7" }]}
+            data={dataRole}
             maxHeight={300}
             labelField="label"
             valueField="value"
-            placeholder="Loại công việc"
-            searchPlaceholder="Tìm kiếm..."
-            value={workValue}
+            placeholder="Vị trí công việc"
+            value={roleValue}
             onChange={(item) => {
-              setworkValue(item.value);
+              setroleValue(item.value);
+              setisJobVisible(item.value === "2");
             }}
-            onChangeText={setjobUser}
+            onChangeText={setroleUser}
             renderLeftIcon={() => (
-              <Ant style={styles.icon} name="idcard" size={20} />
+              <Icon style={styles.icon} name="add-moderator" size={20} />
             )}
           />
-        )}
 
-        <TouchableOpacity
-          style={styles.buttonRegister}
-          onPress={handleRegister}
-        >
-          <Text style={styles.textButton}>Đăng Ký</Text>
-        </TouchableOpacity>
+          {/* vai trò công việc*/}
+
+          {isJobVisible && (
+            <Dropdown
+              style={[
+                styles.dropdown,
+                { borderColor: "#0E55A7", marginTop: 30 },
+              ]}
+              inputSearchStyle={styles.inputSearchStyle}
+              data={dataWork}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Loại công việc"
+              searchPlaceholder="Tìm kiếm..."
+              value={workValue}
+              onChange={(item) => {
+                setworkValue(item.value);
+              }}
+              onChangeText={setjobUser}
+              renderLeftIcon={() => (
+                <Ant style={styles.icon} name="idcard" size={20} />
+              )}
+            />
+          )}
+
+          <TouchableOpacity
+            style={styles.buttonRegister}
+            onPress={handleRegister}
+          >
+            <Text style={styles.textButton}>Đăng Ký</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );

@@ -35,12 +35,12 @@ const ItemListJob_role = (props) => {
 
       if (response.status === 200) {
         setSelectedStatus(newStatus);
-        props.loadData();
       }
       Toast.show({
         type: "success",
         text1: "Cập nhật trạng thái thành công",
       });
+      props.loadData();
     } catch (error) {
       console.log("hi", newStatus);
       console.error("Error updating status:", error);
@@ -54,6 +54,22 @@ const ItemListJob_role = (props) => {
     { label: "Đã hủy", value: "Đã hủy" },
   ];
 
+  // định dạng tiền việt
+  const formatCurrency = (amount) => {
+    const formatter = new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+
+    return formatter.format(amount);
+  };
+
+  // định dạng lại ngày
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "numeric", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("vi-VN", options);
+  };
+
   return (
     <View style={styles.container}>
       <View style={[styles.status, { backgroundColor: statusBackgroundColor }]}>
@@ -66,9 +82,7 @@ const ItemListJob_role = (props) => {
             </View>
           ))}
 
-          <Text style={{ color: "#8a8a8a" }}>
-            Khách hàng: {item.client.name}
-          </Text>
+          <Text style={{ color: "black" }}>Khách hàng: {item.client.name}</Text>
 
           <ScrollView
             horizontal
@@ -126,60 +140,87 @@ const ItemListJob_role = (props) => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ marginTop: 5, color: "#b0b0b0" }}>
+            <Text
+              style={{ marginTop: 5, color: "#0E55A7", fontWeight: "bold" }}
+            >
               Thời gian: {item.started}
             </Text>
             <TouchableOpacity
               style={{ marginTop: 5 }}
               onPress={() => setModalVisible(true)}
             >
-              <Text style={{ color: "#0E55A7", fontWeight: 'bold' }}>Chi tiết...</Text>
+              <Text style={{ color: "#0E55A7", fontWeight: "bold" }}>
+                Chi tiết...
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
       {/* Modal chi tiết đơn hàng */}
-      <Modal isVisible={isModalVisible} /* Other modal props go here */>
-        <View style={styles.modalContent}>
+      <Modal isVisible={isModalVisible}>
+        <View style={modalStyles.modalContent}>
+          <View style={modalStyles.headerContainer}>
+            <Text style={modalStyles.headerText}>CHI TIẾT CÔNG VIỆC</Text>
+          </View>
+          <Text style={modalStyles.headerText}>
+            Bắt đầu vào: {item.started}
+          </Text>
           {item.services.map((service) => (
-            <View key={service._id} style={{ flexDirection: "row" }}>
+            <View key={service._id} style={modalStyles.serviceContainer}>
               <Image
                 source={{ uri: service.serviceID.image }}
-                style={{ width: 100, height: 100 }}
+                style={modalStyles.serviceImage}
               />
-              <View style={{ marginStart: 10 }}>
-                <Text style={styles.nameService}>{service.serviceID.name}</Text>
-                <Text style={styles.priceService}>
-                  {service.serviceID.price}
+              <View style={{ flex: 1 }}>
+                <Text style={modalStyles.serviceName}>
+                  {service.serviceID.name}
                 </Text>
-                <Text style={styles.description}>
+                <Text style={modalStyles.servicePrice}>
+                  Giá: {formatCurrency(service.serviceID.price)}
+                </Text>
+                <Text style={modalStyles.serviceDescription}>
                   {service.serviceID.description}
                 </Text>
               </View>
             </View>
           ))}
 
-          <Text>{item.client.name}</Text>
-          <Text>{item.client.phone}</Text>
-          <Text>{item.client.gender}</Text>
+          <View style={modalStyles.clientInfo}>
+            <Text style={{ color: "#2c3e50" }}>
+              Tên khách hàng: {item.client.name}
+            </Text>
+          </View>
 
-          {item.staffs.map((staff) => (
-            <View key={staff._id}>
-              <Text>
+          <View style={modalStyles.employeeInfo}>
+            <Text style={{ color: "#2c3e50" }}>Nhân viên phụ trách:</Text>
+            {item.staffs.map((staff) => (
+              <Text key={staff._id} style={{ color: "#2c3e50" }}>
                 {staff.staffID.name} - {staff.staffID.job}
               </Text>
-            </View>
-          ))}
+            ))}
+          </View>
 
-          <Text>{item.location}</Text>
-          <Text>{item.note}</Text>
-          <Text>{item.started}</Text>
-          <Text>{item.deadline}</Text>
-          <Text>{item.createdAt}</Text>
+          <View style={modalStyles.addressInfo}>
+            <Text style={{ color: "#2c3e50" }}>
+              Địa chỉ thực hiện: {item.location}
+            </Text>
+          </View>
 
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text style={{ color: "#0E55A7" }}>Close</Text>
+          <View style={modalStyles.timeInfo}>
+            <Text style={{ color: "#2c3e50" }}>
+              Thời gian hoàn thành: {item.deadline}
+            </Text>
+            <Text style={{ color: "#2c3e50" }}>
+              Ngày tạo đơn: {formatDate(item.createdAt)}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={modalStyles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text>Đóng</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -193,12 +234,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#8a8a8a",
+    borderRadius: 16,
   },
   status: {
     borderRadius: 16,
     paddingLeft: 16,
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
   },
   container1: {
     backgroundColor: "white",
@@ -229,7 +271,7 @@ const styles = StyleSheet.create({
   },
   textNameService: {
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: "bold",
     color: "#1f2633",
   },
   textStatus: {
@@ -258,5 +300,82 @@ const styles = StyleSheet.create({
   nameService: {
     fontSize: 18,
     fontWeight: "500",
+  },
+});
+
+const modalStyles = StyleSheet.create({
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    padding: 20,
+    borderColor: "#0E55A7",
+    borderWidth: 2,
+    margin: 10,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#0E55A7",
+    marginBottom: 20,
+  },
+  serviceContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  serviceImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  serviceName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#2c3e50",
+    marginBottom: 5,
+  },
+  servicePrice: {
+    color: "#2c3e50",
+    marginBottom: 5,
+  },
+  serviceDescription: {
+    color: "#7f8c8d",
+    marginBottom: 10,
+  },
+  clientInfo: {
+    marginBottom: 10,
+  },
+  employeeInfo: {
+    marginBottom: 10,
+  },
+  addressInfo: {
+    marginBottom: 10,
+  },
+  timeInfo: {
+    marginBottom: 10,
+  },
+  dateInfo: {
+    marginBottom: 10,
+  },
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#2c3e50",
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    marginTop: 10,
+    color: "#3498db",
+    fontWeight: "bold",
   },
 });

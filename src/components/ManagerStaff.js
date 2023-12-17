@@ -124,8 +124,8 @@ const ManagerStaff = ({ route, navigation }) => {
       {loading ? (
         // Render Skeleton trong khi data đang load
         <FlatList
-        initialNumToRender={5} // Số lượng mục hiển thị ban đầu
-        onEndReached={fetchData}
+          initialNumToRender={5} // Số lượng mục hiển thị ban đầu
+          onEndReached={fetchData}
           data={listPlaceholder}
           keyExtractor={(_, index) => index.toString()}
           renderItem={() => <ItemListStaff item={null} />}
@@ -134,6 +134,8 @@ const ManagerStaff = ({ route, navigation }) => {
         <FlatList
           data={filteredData ?? listPlaceholder}
           keyExtractor={(item) => item._id}
+          initialNumToRender={1} // Số lượng mục hiển thị ban đầu
+          onEndReached={fetchData}
           refreshing={refreshing}
           onRefresh={handleRefreshData}
           renderItem={({ item }) => {

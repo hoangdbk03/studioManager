@@ -66,12 +66,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#8a8a8a",
+    borderRadius: 16,
   },
   status: {
     borderRadius: 16,
     paddingLeft: 16,
-    borderWidth: 1,
-    borderColor: "#e6e6e6",
+  
   },
   container1: {
     backgroundColor: "white",
